@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.AdminMapper">
+
+	<!-- 通过id获取管理员信息 -->
+	<select id="getAdminByAdminId" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+		where admin_id=#{adminId}
+	</select>
+	<!-- 根据登录帐号查询账户信息 -->
+	<select id="getAdminByAdminAccount" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+		where admin_account=#{adminAccount}
+	</select>
+
+	<!-- 根据员工id查询账户 -->
+	<select id="getAdminByEmpId" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+		where emp_id=#{empId}
+	</select>
+
+	<!-- 根据登录账户id获取对应员工id -->
+	<select id="getEmpByAdminId" resultMap="adminResultMap">
+		select emp_id
+		from t_admin
+		where admin_id=#{admin_id}
+	</select>
+
+	
+	<select id="getAllAdmin" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+	</select>
+
+	<insert id="createAdmin">
+		insert into t_admin(
+		<include refid="adminProperty" />
+		)
+		value(
+		<include refid="adminValues" />
+		)
+	</insert>
+
+	<delete id="deleteAdmin">
+		delete from t_admin
+		where admin_id=#{adminId}
+	</delete>
+
+	<update id="UpdateAdmin" parameterType="admin">
+		update t_admin
+		set
+		admin_account=#{adminAccount},
+		admin_password=#{adminPassWord},
+		emp_id=#{emp.empId}
+		where admin_id=#{adminId}
+	</update>
+
+
+	<!-- 获取其他登录帐号相同的账户 -->
+	<select id="getOtherAdmin" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+		where admin_account=#{adminAccount}
+		and admin_id != #{adminId}
+	</select>
+
+
+
+
+
+
+
+
+
+	<!-- 动态查询 -->
+	<select id="getAdminByFields" resultMap="adminResultMap">
+		select
+		<include refid="adminProperty" />
+		from t_admin
+		<where>
+			<if test="adminId != null ">and admin_id=#{adminId}</if>
+			<if test="adminAccount != null">and admin_account like concat('%',#{adminAccount},'%')
+			</if>
+			<if test="empId != null">and emp_id = #{empId}</if> 
+		</where>
+		<if test="start != null and count != null">
+			limit #{start},#{count}
+		</if>
+	</select>
+	
+	<!-- 动态查询记录条数 -->
+	<select id="getAdminCount" resultType="java.lang.Integer">
+		select count(*) from t_admin
+		<where>
+			<if test="adminId != null ">and admin_id=#{adminId}</if>
+			<if test="adminAccount != null">and admin_account like concat('%',#{adminAccount},'%')
+			</if>
+			<if test="empId != null">and emp_id = #{empId}</if>
+		</where>
+
+	</select>
+	<resultMap type="admin" id="adminResultMap">
+		<id property="adminId" column="admin_id" />
+		<association property="emp" column="emp_id"
+			select="com.bs.admin.mapper.EmployeeMapper.getEmpByEmpId" />
+	</resultMap>
+
+
+
+
+	<sql id="adminProperty">
+		admin_id,admin_account,admin_password,emp_id
+	</sql>
+	<sql id="adminValues">
+		#{adminId},#{adminAccount},#{adminPassWord},#{emp.empId}
+	</sql>
+
+</mapper>
+  

@@ -1,0 +1,133 @@
+package com.bs.admin.service;
+
+import java.util.List;
+
+import com.bs.admin.pojo.ActivityPageData;
+import com.bs.admin.pojo.Book;
+import com.bs.admin.pojo.BookData;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.util.JsonData;
+
+public interface ActivityService {
+
+	/**
+	 * 查询所有活动名
+	 * 
+	 * @return 所有活动名的集合
+	 */
+	List<String> getActivityNameByActivity();
+
+	/**  
+	
+	 * <p>Title: getAllBook</p>  
+	
+	 * <p>Description: 获取书的数据</p>  
+	
+	 * @param bookName		书名
+	 * @param bookCategory	类型
+	 * @param bookStatus	状态
+	 * @param bottomPrice	最低价
+	 * @param topPrice		最高价
+	 * @param pageNum		页数
+	 * @param pageSize		每页条数
+	 * @return  
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	PageData<Book> getAllBook(String bookName, String bookCategory, String bookStatus, Double bottomPrice, Double topPrice, Integer pageNum, Integer pageSize);
+
+	/**
+	 * 查询所有有活动的书
+	 * 
+	 * @param bookName      书名
+	 * @param activityName  活动名
+	 * @param activityStart 活动开始时间
+	 * @param activityEnd   活动结束时间
+	 * @param pageNum       当前页
+	 * @param pageSize      每页条数
+	 * 
+	 * @return 页面数据
+	 */
+	PageData<ActivityPageData> getActivityBookPageData( Integer pageNum, Integer pageSize);
+
+	/**
+	 * 添加活动(按条件添加)--从页面返回的数据
+	 * 
+	 * @param bookName      	书名
+	 * @param activityName  	活动名
+	 * @param activityDiscount 	折扣
+	 * @param activityStart 	活动开始时间
+	 * @param activityEnd   	活动结束时间
+	 * 
+	 * @return teue/false
+	 */
+	Boolean insertActivity(String bookName, String activityName, Integer activityDiscount, String activityStart, String activityEnd);
+	
+	/**
+	 * 添加活动(按条件添加)--从页面返回的数据
+	 * 
+	 * @param bookName      	书名
+	 * @param activityName  	活动名
+	 * @param activityDiscount 	折扣
+	 * @param activityStart 	活动开始时间
+	 * @param activityEnd   	活动结束时间
+	 * 
+	 * @return JsonData数据
+	 */
+	JsonData addActivity(String bookName, String activityName, Integer activityDiscount, String activityStart, String activityEnd);
+
+	/**
+	 * 修改活动
+	 * 
+	 * @return Integer
+	 */
+	Integer updateActivity(ActivityPageData activityPageData);
+	
+	/**
+	 * 删除活动---->添加取消活动---->删除中间表数据---->再从活动表删除
+	 * 
+	 * 删除活动—————>删除活动
+	 * 
+	 * @return Integer
+	 */
+	JsonData deleteActivity(ActivityPageData activityPageData);
+	
+	/**
+	 * 查询取消的活动
+	 * 
+	 * @return ActivityPageData
+	 */
+	PageData<ActivityPageData> getCancleActivity(Integer pageNum,Integer pageSize);
+	
+	/**
+	 * 按条件查询数据 
+	 * 
+	 * @return 页面数据
+	 */
+	PageData<ActivityPageData> getAllActivity(Integer pageNum, Integer pageSize,String bookName, String activityName,String activityStart ,String activityEnd);
+	
+	
+	/**  
+	
+	 * <p>Title: insertActivity</p>  
+	
+	 * <p>Description: 批量添加活动</p>  
+	
+	 * @param bookData 活动与书的数据集合
+	 * @return  
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	JsonData insertActivity(BookData bookData);
+	
+	/**  
+	
+	 * <p>Title: delleteActivity</p>  
+	
+	 * <p>Description: 批量删除</p>  
+	
+	 * @param ap 数据集合
+	 * @return  
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	JsonData deleteActivity(List<ActivityPageData> ap);
+
+}

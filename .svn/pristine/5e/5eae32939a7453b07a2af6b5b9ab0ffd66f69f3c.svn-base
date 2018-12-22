@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.ActivityMapper">
+	<!-- 查询所有活动的名字 -->
+	<select id="getActivityNameByActivity" resultMap="activityResultMap">
+		select
+		activity_name
+		from t_activity
+	</select>
+	<!-- 添加活动 -->
+	<insert id="insertActivity">
+		insert into t_activity
+		(activity_name,activity_discount,activity_start,activity_end)
+		values
+		(#{activityName},#{activityDiscount},#{activityStart},#{activityEnd})
+	</insert>
+	<!-- 添加书的活动 -->
+	<insert id="insertNewActiviryBook">
+		INSERT INTO
+		t_activity
+		(activity_name,activity_discount,activity_start,activity_end) 
+		VALUES(<include refid="activityNewValues" />)
+	</insert>
+	<!-- 查询activity_id -->
+	<select id="getActivityIdByActivity" resultMap="activityResultMap">
+		select
+		activity_Id
+		from t_activity where 
+		activity_name = #{activityName} and
+		activity_discount = #{activityDiscount} and
+		activity_start =#{activityStart} and
+		activity_end = #{activityEnd}
+	</select>
+	<!-- 添加中间表 -->
+	<insert id="insertActivityBook">
+		INSERT INTO
+		t_activity_books
+		(<include refid="ActivityBookColumns" />)
+		VALUES (<include refid="ActivityBookValues" />)
+	</insert>
+	<!-- 查询所有的活动 -->
+	<select id="getAllActivity" resultMap="activityResultMap">
+		select * from t_activity
+	</select>
+	<!-- 查询所有参与的活动的书 -->
+	<select id="getAllActivityBook" resultMap="activityResultMap">
+		select
+		<include refid="activityColumns" />,<include refid="bookColumns" />
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id and b.book_id = c.book_id
+	</select>
+	<!-- 修改活动 -->
+	<update id="updateActivityByActivityId">
+		update t_activity set
+		activity_name = #{activityName},
+		activity_discount = #{activityDiscount},
+		activity_start =
+		#{activityStart},
+		activity_end = #{activityEnd}
+		where activity_id =
+		#{activityId}
+	</update>
+	<!-- 删除中间表数据 -->
+	<delete id="deleteActivityBook">
+		delete from t_activity_books
+		where activity_id = #{activityId} and
+		book_id = #{bookId}
+	</delete>	
+	<!-- 删除活动 -->
+	<delete id="deleteActivity">
+		delete from t_activity
+		where activity_id = #{activityId}	
+	</delete>	
+	
+	
+	<resultMap type="activity" id="activityResultMap" autoMapping="true">
+		<id column="activity_id" property="activityId" />
+		<collection property="books" ofType="book" autoMapping="true" />
+	</resultMap>
+	
+	<sql id="activityColumns">a.activity_id,a.activity_name,a.activity_discount,a.activity_start,a.activity_end
+	</sql>
+	<sql id="activityValues">#{activityId},#{activityName},#{activityDiscount},#{activityStart},#{activityEnd}
+	</sql>
+	<sql id="allActivityColumns">activity_id,activity_name,activity_discount,activity_start,activity_end
+	</sql>
+	<sql id="bookColumns">c.book_name
+	</sql>
+	<sql id="ActivityBookColumns">activity_id,book_id
+	</sql>
+	<sql id="ActivityBookValues">#{activityId},#{bookId}
+	</sql>
+	<sql id="activityNewColumns">activity_name,activity_discount,activity_start,activity_end
+	</sql>
+	<sql id="activityNewValues">#{activityName},#{activityDiscount},#{activityStart},#{activityEnd}
+	</sql>
+</mapper>

@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.JobMapper">
+	<!-- 查询职位 -->
+	<select id="getJobByJobId" resultMap="jobResultMap">
+		select
+		<include refid="jobColumns" /> 
+		from t_job 
+		where job_id = #{jobId}
+	</select>
+	
+	<!-- 根据职位名称查询职位 -->
+	<select id="getJobByJobName" resultMap="jobResultMap">
+		select
+		<include refid="jobColumns" /> 
+		from t_job 
+		where job_name = #{jobName}
+	</select>
+	
+	
+	<!-- 添加职位 -->
+	<insert id="createJob">
+		insert into t_job 
+		(
+		<include refid="jobColumns" />
+		)
+		value(
+		<include refid="jobValues" />
+		)
+	</insert>
+	<!-- 查询所有职位 -->
+	<select id="getAllJob" resultMap="jobResultMap">
+		select 
+		<include refid="jobColumns"/> 
+		from t_job
+	</select>
+	
+	<!-- 查询所有职位名称 -->
+	<select id="getAllJobName" resultMap="jobResultMap">
+		select job_name from t_job
+	</select>
+	
+	<resultMap type="job" id="jobResultMap">
+		<id property="jobId" column="job_id"/>
+		<!-- <collection property="emps" column="job_id" ofType="employee" select="com.bs.admin.mapper.EmployeeMapper.getEmpByJobId"/> -->
+	</resultMap>
+	<sql id="jobColumns">job_id,job_name,job_level,job_allowance,job_basic_pay
+	</sql>
+	<sql id="jobValues">#{jobId},#{jobName},#{jobLevel},#{jobAllowance},#{jobBasicPay}
+	</sql>
+	
+	<!-- 动态查询 -->
+	<select id="getJobByFields" resultMap="jobResultMap">
+		select
+		<include refid="jobColumns" />
+		from t_job
+		<where>
+			<if test="jobId != null ">and job_id=#{jobId}</if>
+			<if test="jobName != null">and job_name like concat('%',#{jobName},'%')
+			</if>
+			<if test="jobLevel != null">and job_level = #{jobLevel}</if>
+			<if test="pay1 != null and pay2 != null">and job_basic_pay between #{pay1} and #{pay2}</if>
+		</where>
+	</select>
+	
+	<!-- 修改职位 -->
+	<update id="UpdateJob" parameterType="job">
+		update t_job
+		set
+		job_name=#{jobName},
+		job_level=#{jobLevel},
+		job_allowance=#{jobAllowance},
+		job_basic_pay=#{jobBasicPay}
+		where job_id=#{jobId}
+	</update>
+	<!-- 删除职位 -->
+	<delete id="deleteJob">
+		delete from t_job 
+  		where job_id=#{jobId}
+	</delete>
+</mapper>

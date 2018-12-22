@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.StockPoJoMapper">
+
+
+	<!--批量入库 -->
+	<insert id="insertStockBatch" parameterType="Stock">
+
+		insert into t_stock(
+		<include refid="stockColumnInsert" />
+		)
+		values
+		<foreach collection="collection" separator="," item="item">
+			(
+			<include refid="stockValueBatchInsert" />
+			)
+		</foreach>
+	</insert>
+
+
+	<!-- 批量更新库存的数量 -->
+	<update id="updateStockNumBatch" parameterType="list">
+		update t_stock
+		<trim prefix="set" suffixOverrides=",">
+			<trim prefix="stock_num =(case" suffix="end)">
+				<foreach collection="list" item="item" index="index">
+					<if test="item.stockId!=null">
+						when stock_id=#{item.stockId} then #{item.stockNum}
+					</if>
+				</foreach>
+			</trim>
+			where
+		</trim>
+		stock_id in(
+		<foreach collection="list" separator="," item="item" index="index">
+			#{item.stockId}
+		</foreach>
+		)
+
+	</update>
+
+
+<!-- 废弃的方法 -->
+	<!-- 查询数据库中可供修改的数量 -->
+	<select id="selectBookStockForSale" resultMap="StockPojoMap">
+		select stock_id from t_stock  
+	where book_id=${bookId}
+	and
+		stock_num &gt;0
+		and
+		stock_id &lt;= (select min(stock_id) from t_stock
+		where  book_id=${bookId})
+	</select>
+
+	<!-- 批量查询数据库中的库存 -->
+<select id="selectBookStockForSaleBatch" resultMap="StockPojoMap">
+		select stock_id,purchase_item_id,book_id,stock_num,store_house_id
+		from t_stock
+		where stock_id in
+		<foreach collection="list" item="item" index="index"
+			open="(" close="" separator=",">
+			<include refid="selectByBookBatch" />
+		</foreach>)
+</select> 
+
+
+
+	<sql id="selectByBookBatch">
+	
+	(select stock_id from t_stock 
+	where book_id=${item.bookId}
+	and
+		stock_num &gt;0
+		and
+		stock_id &lt;= (select min(stock_id) from t_stock
+		where  book_id=${item.bookId}))
+	
+	</sql> 
+
+
+
+
+
+
+
+	
+	<!-- 主要是为了修改库存更方方便快捷  -->
+	<resultMap type="StockPojo" id="StockPojoMap" autoMapping="true">
+
+	</resultMap>
+
+
+
+
+
+	<sql id="StockColumn">
+		`stock_id`,
+		`purchase_item_id`,
+		`book_id`,
+		`store_house_id`,
+		`stock_num`,
+		`stock_time`
+	</sql>
+		<sql id="stockPojoColumn">
+		`purchase_item_id`,
+		`stock_num`,
+		`book_id`,
+		`store_house_id`
+		</sql>
+	
+	<sql id="stockColumnInsert">
+		`purchase_item_id`,
+		`stock_num`,
+		`book_id`,
+		`store_house_id`
+	</sql>
+	<sql id="stockValueInsert">
+		#{purchaseItemId},
+		#{stockNum},
+		#{bookId},
+		#{storeHouseId}
+	</sql>
+	<sql id="stockValueBatchInsert">
+		#{item.purchaseItemId},
+		#{item.stockNum},
+		#{item.bookId},
+		#{item.storeHouseId}
+	</sql>
+	<sql id="stockValues">
+		#{stockId},
+		#{purchaseItemId},
+		#{bookId},
+		#{stockNum},
+		#{storeHouseId},
+		#{stockTime}
+	</sql>
+
+
+
+
+
+</mapper>

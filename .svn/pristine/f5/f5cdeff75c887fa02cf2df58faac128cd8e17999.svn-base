@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.StockMapper">
+
+	<!-- 查询所有书的库存量 -->
+	<select id="selectVStock" resultMap="StockMap">
+		select book_id ,stock_num from v_stock
+		<where>
+		<if test="bookName!=null and bookName!=''">
+		
+		and book_id in(select book_id from t_book where book_Name like concat('%','${bookName}','%')) 
+		
+		</if>
+		<if test="min!=null and max!=null">
+		
+		and stock_num between ${min} and ${max}
+		
+		</if>
+		</where>
+	</select>
+
+
+	<!-- 根據批次，書名,存储所在的仓库以及存储时间模糊查詢 -->
+	<select id="dynamicSelect" resultMap="StockMap">
+		select
+		<include refid="StockColumn" />
+		from t_stock
+		<where>
+			<if test="purchaseBatch!=null  and purchaseBatch!=''">
+				and purchase_item_id in(
+				select purchase_item_id from t_purchase_item where
+				purchase_id in(
+				select purchase_id from t_purchase where purchase_batch like
+				concat('%','${purchaseBatch}','%')
+				))
+			</if>
+			<if test="bookName!=null and bookName!=''">
+				and
+				book_id in(
+				select book_id from t_book where book_name like
+				concat('%','${bookName}','%')
+				)
+			</if>
+			<if test="storeHouseId!=null and storeHouseId!=''">
+				and store_house_id = ${storeHouseId}
+			</if>
+			<if test="startTime=null and startTime!=''">
+				AND stock_time &gt;= '${startTime}'
+			</if>
+			<if test="endTime!=null and endTime!=''">
+				AND stock_time &lt;='${endTime}'
+			</if>
+			<if test="min!=null">
+				AND stock_num &gt;= ${min}
+			</if>
+			<if test="max!=null">
+				AND stock_num &lt;= ${max}
+			</if>
+			
+
+		</where>
+	</select>
+
+	<select id="selectStockNumRange" resultMap="StockMap">
+
+		select
+		<include refid="VStockColumn" />
+		from v_stock
+		<where>
+			<if test="min!=null">
+				AND stock_num &gt;= ${min}
+			</if>
+			<if test="max!=null">
+				AND stock_num &lt;= ${max}
+			</if>
+		</where>
+	</select>
+
+
+
+
+
+	<!--查询某本书的所有库存情况 -->
+
+	<select id="selectBookStock" resultMap="StockMap">
+
+		select
+		<include refid="StockColumn" />
+		from t_stock where book_id=${bookId}
+			<if test="min!=null">
+				AND stock_num &gt;= ${min}
+			</if>
+			<if test="max!=null">
+				AND stock_num &lt;= ${max}
+			</if>
+		
+		</select>
+
+	<!-- 查询指定book的库存 -->
+	<select id="selectBookStockNum" resultType="java.lang.Integer">
+
+		select stock_num from v_stock where book_id=${bookId}
+
+	</select>
+
+
+	<resultMap type="Stock" id="StockMap" autoMapping="true">
+	<association property="purchaseItem" javaType="PurchaseItem" select="com.bs.admin.mapper.PurchaseItemMapper.selectPurchaseItemById" 
+			column="purchase_item_id" /> 
+		<association property="book" javaType="Book"
+			select="com.bs.admin.mapper.BookMapper.getBookByBookId" column="book_id" />
+		<association property="storeHouse" javaType="StoreHouse"
+			select="com.bs.admin.mapper.StoreHouseMapper.selectById" column="store_house_id" />
+
+	</resultMap>
+
+
+	<sql id="StockColumn">
+		`stock_id`,
+		`purchase_item_id`,
+		`book_id`,
+		`store_house_id`,
+		`stock_num`,
+		`stock_time`
+	</sql>
+		<sql id="VStockColumn">
+		`book_id`,
+		`stock_num`
+	</sql>
+
+
+</mapper>

@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.ActivityPageDataMapper">
+	<!-- 查询是否存在 -->
+	<select id="getIdCountByBookName" resultType="java.lang.Integer">
+		SELECT
+		count(a.activity_id) from t_activity a,t_activity_books b,t_book c
+		where a.activity_id = b.activity_id
+		and b.book_id = c.book_id
+		and c.book_name = #{bookName}
+		and a.activity_name
+		= #{activityName}
+		and activity_discount = #{activityDiscount}
+		and
+		a.activity_start =#{activityStart}
+		and a.activity_end = #{activityEnd}
+	</select>
+	<!-- 添加历史活动 -->
+	<insert id="insertHistoryActivity">
+		insert into t_history_activity
+		(book_id,book_name,activity_name,activity_discount,activity_start,activity_end)
+		values
+		(#{bookId},#{bookName},#{activityName},#{activityDiscount},#{activityStart},#{activityEnd})
+	</insert>
+	<!-- 删除历史活动 -->
+	<delete id="delHistoryActivity">
+		delete from t_history_activity
+		where activity_id =
+		#{activityId}
+	</delete>
+	<!-- 查询历史活动的总数 -->
+	<select id="getHistoryTotal" resultType="java.lang.Integer">
+		select count(*) from
+		t_history_activity
+	</select>
+		<!-- 分页查询历史活动数据 -->
+	<select id="getHistoryActivity" resultMap="activityPageDataResultMap">
+		SELECT
+		activity_id,book_id,book_name,activity_name,activity_discount,activity_start,activity_end
+		from t_history_activity
+		LIMIT #{start},#{end}
+	</select>
+		<!-- 查询活动总数 -->
+	<select id="getTotal" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id
+		and b.book_id = c.book_id
+		<if test="bookName!=null and bookName!='' ">
+			and c.book_name = #{bookName}
+		</if>
+		<if test="activityName!=null and activityName!='' ">
+			and a.activity_name = #{activityName}
+		</if>
+		<if test="null!=activityStart and activityStart!='' and null!= activityEnd and activityEnd!=''">
+			and a.activity_start &gt;= #{activityStart}
+			and a.activity_end &lt;= #{activityEnd}
+		</if>
+	</select>
+	<!-- 分页查询活动数据 -->
+	<select id="getAllActivity" resultMap="activityPageDataResultMap">
+		SELECT
+		a.activity_id,c.book_id,c.book_name,a.activity_name,a.activity_discount,a.activity_start,a.activity_end
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id
+		and b.book_id = c.book_id
+		<if test="bookName!=null and bookName!='' ">
+			and c.book_name = #{bookName}
+		</if>
+		<if test="activityName!=null and activityName!='' ">
+			and a.activity_name = #{activityName}
+		</if>
+		<if test="null!=activityStart and activityStart!='' and null!= activityEnd and activityEnd!=''">
+			and a.activity_start &gt;= #{activityStart}
+			and a.activity_end &lt;= #{activityEnd}
+		</if>
+		<if test="null!=start and null!= end">
+			LIMIT #{start},#{end}
+		</if>
+	</select>
+	<!-- <![CDATA[>=]]> <![CDATA[<=]]>  -->
+	<!-- 查询中间表中id的个数 -->
+	<select id="getActivityIdTotal" resultType="java.lang.Integer">
+		select count(activity_id) from
+		t_activity_books
+		where activity_id =#{activityId};
+	</select>
+
+	<resultMap type="activityPageData" id="activityPageDataResultMap" autoMapping="true">
+	</resultMap>
+	<sql id="activityPageDataColumns">activity_id,book_id,book_name,activity_name,activity_discount,activity_start,activity_end
+	</sql>
+	<sql id="activityPageDataValues">#{activityId},#{bookName},#{activityName},#{activityDiscount},#{activityStart},#{activityEnd}
+	</sql>
+</mapper>

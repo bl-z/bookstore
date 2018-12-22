@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.PurchaseMapper">
+
+	<!-- 新增一个采购信息 -->
+
+	<insert id="insertPurchase">
+		insert into t_purchase(
+		<include refid="purchaseColumnWithoutId" />
+		)
+		values(
+		<include refid="purchaseValuesWithoutId" />
+		)
+	</insert>
+
+	<delete id="deletePurchaseById">
+		delete from t_purchase where
+		purchase_id=#{purchaseId}
+
+	</delete>
+	
+	
+	<!-- 更新采购状态为已完成 -->
+	<update id="updatePurchaseStatusToStock">
+		update t_purchase set purchase_status=case when
+		(select count(*) from t_purchase_item where purchase_id=${purchaseId})
+		=(select count(*) from t_stock where purchase_item_id in(select
+		purchase_item_id from t_purchase_item where
+		purchase_id=${purchaseId}))
+		then 4 end where purchase_id=${purchaseId}
+	</update>
+	<!-- 手动添加purchaseId -->
+	<update id="updatePurchaseStatusToStockBatch">
+		update t_purchase set  
+		
+		<trim prefix="purchase_status=(case" suffix="end)">
+				<foreach collection="list" item="item" index="index">
+					<if test="item!=null">
+						when <include refid="updateStatusCondition"/> then 4
+					</if>
+				</foreach>
+			</trim>
+		where  purchase_id in(
+		<foreach collection="list" separator="," item="item" index="index">
+		 ${item}
+		</foreach>
+		)
+		
+		
+	</update>
+
+	
+<sql id="updateStatusCondition">
+		(select count(*) from t_purchase_item where purchase_id=${item})
+		=(select count(*) from t_stock where purchase_item_id in(select
+		purchase_item_id from t_purchase_item where
+		purchase_id=${item}))
+</sql>
+
+
+
+	<!-- 更新一个采购信息 -->
+	<update id="updatePurchase">
+		update t_purchase
+		<trim prefix="set" suffixOverrides=",">
+			<if test="null != purchaseDate and purchaseDate!=''">
+				purchase_date=#{purchaseDate},
+			</if>
+			<if test="null!= purchaseBatch and purchaseBatch !=''">
+				purchase_batch=#{purchaseBatch},
+			</if>
+			<if test="null!= employee and employee.empId!=null">
+				emp_id=#{employee.empId},
+			</if>
+			<if test="null!=supplier and supplier.supplierId !=null">
+				supplier_id=#{supplier.supplierId},
+			</if>
+			<if test="null!=purchaseStatus">
+				purchase_status=#{purchaseStatus},
+			</if>
+			<if test="null!=purchaseLog and purchaseLog!=''">
+				purchase_log=#{purchaseLog},
+			</if>
+		</trim>
+		where purchase_id=#{purchaseId}
+	</update>
+
+
+	<!-- 动态查询包含指定id，模糊查询批次，员工id,采购状态，提供方id,采购日期，结束日期 -->
+	<select id="dynamicSelect" resultMap="purchaseMap">
+		select
+		<include refid="purchaseColumn" />
+		from t_purchase
+		<where>
+		
+		<if test="purchase!=null">
+			<if test="purchase.purchaseId!= null and purchase.purchaseId!=''">
+				and purchase_Id=#{purchase.purchaseId}
+			</if>
+			<if test="purchase.purchaseBatch!= null and purchase.purchaseBatch!=''">
+				and
+				 purchase_batch like concat('%',#{purchase.purchaseBatch},'%') 
+			</if>
+			<if test="purchase.employee != null and purchase.employee.empId!= null ">
+				and emp_id=#{purchase.employee.empId}
+			</if>
+			<if test="purchase.purchaseStatus!=null">
+				and purchase_status=#{purchase.purchaseStatus}
+			</if>
+			<if test="purchase.supplier!=null and purchase.supplier.supplierId!=null">
+				and supplier_id=#{purchase.supplier.supplierId}
+			</if>
+		</if>
+			<if test="startDate=null and startDate!=''">
+				AND purchase_date &gt;= '${startDate}'
+			</if>
+			<if test="endDate!=null and endDate!=''">
+				AND purchase_date &lt;='${endDate}'
+			</if>
+		</where>
+
+	</select>
+	
+	<!-- 查询所有计划中的订单和收入供财务支出  -->
+	<select id="selectPurchaseBuget" resultMap="purchaseMap">
+	select  p.*, round(sum(purchase_num*purchase_price),2)  total_pay 
+	from t_purchase_item pi, t_purchase p  where
+	p.purchase_id = pi.purchase_id
+	and p.purchase_id in
+	(select p.purchase_id 
+	from t_purchase p where p.purchase_status=1 GROUP BY p.purchase_id)
+	GROUP BY p.purchase_id
+	</select>
+
+	
+	
+	<!-- 通过id值查询采购对象 -->
+	<select id="selectPurchaseById" resultMap="purchaseMap">
+		select
+		<include refid="purchaseColumn" />
+		from t_purchase where purchase_id=#{purchaseId}
+	</select>
+	
+	<select id="selectPurchaseStatus3" resultType="java.lang.Integer">
+	select purchase_id from t_purchase where purchase_status=3
+	</select>
+	
+
+	<!-- 查詢所有的采购批次，返回String -->
+	<select id="selectPurchaseBatch" resultType="java.lang.String">
+		select
+		purchase_batch from t_purchase group by purchase_batch
+	</select>
+	<!-- 查询某订单的所有价格总和 -->
+	<select id="selectPurchasePay" resultType="java.lang.Double">
+		select round(sum(purchase_num*purchase_price),2) from t_purchase_item where
+		purchase_id=${purchaseId};
+	</select> 
+	
+
+	<resultMap id="purchaseMap" type="Purchase" autoMapping="true">
+		<association property="supplier" javaType="Supplier"
+			select="com.bs.admin.mapper.SupplierMapper.selectBySupplierId"
+			column="supplier_id" />
+		<association property="employee"
+			select="com.bs.admin.mapper.EmployeeMapper.getEmpByEmpId" column="emp_id"
+			javaType="Employee" />
+	</resultMap>
+
+
+
+	<!-- purchase 中的所有字段 -->
+
+	<sql id="purchaseColumn">
+		purchase_id,purchase_batch,purchase_date,emp_id,supplier_id,purchase_status,purchase_log
+	</sql>
+	
+
+
+	<!-- 對象中的所有字段 -->
+
+	<sql id="purchaseValues">
+		#{purchaseId},
+		#{purchaseBatch},
+		#{purchaseDate},
+		#{employee.empId},
+		#{supplier.supplierId},
+		#{purchaseStatus},
+		#{purchaseLog}
+	</sql>
+	<sql id="purchaseColumnWithoutId">
+		purchase_batch,purchase_date,emp_id,supplier_id,purchase_status,purchase_log
+	</sql>
+
+	<!-- 對象中的所有字段 -->
+
+	<sql id="purchaseValuesWithoutId">
+		#{purchaseBatch},
+		#{purchaseDate},
+		#{employee.empId},
+		#{supplier.supplierId},
+		#{purchaseStatus},
+		#{purchaseLog}
+	</sql>
+
+	<!-- 一对多查询查询合作历史记录 -->
+
+
+
+</mapper>
+

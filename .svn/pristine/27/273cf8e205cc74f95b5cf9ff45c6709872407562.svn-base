@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.UserGetCouponMapper">
+	<!--  领取优惠券  -->
+	<insert id="insertUserGetCoupon">
+		insert into t_user_get_coupon
+		(<include refid="userGetCouponColumns"/>)
+		values
+		(<include refid="userGetCouponValues"/>)
+	</insert>
+	<!-- 查询用户的优惠券 -->
+	<select id="getAllUserGetCouponByUserId" resultMap="userGetCouponResultMap">
+		select a.coupon_id,a.coupon_name,a.coupon_money,b.coupon_get_time,b.coupon_use_status,b.coupon_use_time 
+		from t_coupon a,t_user_get_coupon b where a.coupon_id = b.coupon_id and b.user_id =#{userId}
+	</select>
+	<!-- 优惠券使用 -->
+	<update id="updateUserCouponByCouponGetId">
+		update t_user_get_coupon set
+		coupon_use_status = #{couponUseStatus},
+		coupon_use_time = #{couponUseTime}
+		where user_id = #{userId}	
+	</update>
+	
+	<resultMap type="userGetCoupon" id="userGetCouponResultMap" autoMapping="true">
+	</resultMap>
+	<sql id="userGetCouponColumns">user_id,coupon_id,coupon_get_time,coupon_use_status,coupon_use_time
+	</sql>
+	<sql id="userGetCouponValues">#{userId},#{couponId},#{couponGetTime},#{couponUseStatus},#{couponUseTime}
+	</sql>
+</mapper>

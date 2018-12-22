@@ -1,0 +1,187 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+	System.out.print("basePath : " + basePath);
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/demo/demo.css">
+	<link rel="stylesheet" href="<%=path%>/css/wsk.css">
+	<link rel="stylesheet" href="<%=path%>/css/tips.css">
+<script type="text/javascript" src="<%=path%>/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.datagrid.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.dialog.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.form.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.messager.js"></script>
+<script type="text/javascript" src="<%=path%>/js/purchase/purchaseAction.js"></script>
+<script type="text/javascript" src="<%=path%>/js/purchase/purchaseItemAction.js"></script>
+<script type="text/javascript" src="<%=path%>/js/purchase/purchaseValidate.js"></script>
+<script type="text/javascript" src="<%=path%>/js/tips.js"></script>
+
+
+<title>采购管理</title>
+
+</head>
+<body>
+
+<div>
+
+</div>
+	<table id="dg" title="采购信息" class="easyui-datagrid" onClickRow="ClickRow" toolbar="#toolBar" >
+		
+	</table>
+
+	<div id="toolBar">
+	<button  id="searchButton" onclick="doSearch()"  style="width: 100px" >查&nbsp;询</button>
+	&emsp;
+	采购批次
+	<input id="searchBatchC" class="easyui-combobox" style="width: 100px" />
+	&emsp;
+	采购状态
+	<select id="searchStatus" class="easyui-combobox" style="width: 100px;">
+			<option value=''>全部状态</option>
+			<option value='1'>计划中</option>
+			<option value='2'>进行中</option>
+			<option value='3'>已完成</option>
+			<option value='0'>已取消</option>
+   </select> 
+			&emsp;
+		
+			&emsp;
+			 自<input id="startDate" type="text"
+			class="easyui-datebox" style="width: 100px" /> 
+			&ensp;
+			至
+			&ensp;<input
+			id="endDate" type="text" class="easyui-datebox" style="width: 100px" />
+		<br> 
+			<a	 class="easyui-linkbutton" iconCls="icon-nav" plain="true"	onclick="postPurchase()">添加采购记录</a> 
+			 <a  class="easyui-linkbutton" iconCls="icon-nav" plain="true" onclick="putPurchase()">修改记录</a>
+			<a  class="easyui-linkbutton" iconCls="icon-nav" plain="true" onclick="delPurchase()">删除采购记录</a> 
+		
+	</div>
+
+	<div id="PurchaseInfo" class="easyui-dialog" style="width: 400px; height: 280px; padding: 10px 20px" closed="true"  buttons="#dlg-buttons"  modal="true">
+		<div class="ftitle">采购信息</div>
+		<form id="fm" method="post">
+			<div class="fitem">
+				<label>ID:</label> <input name="purchaseId" class="easyui-textbox"
+					data-options="readonly:true">
+			</div>
+			<div class="fitem">
+				<label>采购批次:</label> <input name="purchaseBatch" class="easyui-textbox">
+			</div>
+			<div class="fitem">
+				<label>采购人:</label> 
+				<input name="employee" class="easyui-textbox" >
+			</div>
+			<div class="fitem">
+				<label>供应商:</label> 	<input name="supplier" class="easyui-textbox" >
+			</div>
+			<div class="fitem">
+				<label>采购状态:</label>
+				<select id="searchStatus" class="easyui-combobox" name="purchaseStatus" style="width: 100px;">
+			<option value='1'>计划中</option>
+			<option value='2'>进行中</option>
+			<option value='3'>已完成</option>
+			<option value='0'>已取消</option>
+			</select> 
+			</div>
+			<div class="fitem">
+				<label>采购日期:</label> <input name="purchaseDate" type="text" style="width: 100px;"
+					class="easyui-datebox" >
+			</div>
+			<div class="fitem">
+				<label>采购说明:</label>
+				<textarea name="purchaseLog" > </textarea>
+			</div>
+			
+			
+			
+		</form>
+		<div> </div>
+	</div>
+	
+		<div id="dlg-buttons">
+		
+	
+	 	</div>
+	
+	
+	<div id="PIInfo" class="easyui-dialog"
+		style="width: 400px; height: 280px; padding: 10px 20px" closed="true">
+		<div class="ftitle">条目</div>
+		<div id="buttonPII">
+		<button onclick="appendPII()">添加</button>
+		<button onclick="PIIData()">应用</button>
+		</div>
+		
+			<div class="fitem">
+				<label>商品ID</label>
+				<input id="bookPII" class="easyui-textbox">
+			</div>
+			<div class="fitem">
+				<label>数量</label>
+				 <input id="numberPII" class="easyui-textbox"  data-options="required:true,validType:'money'"  >
+			</div>
+			<div class="fitem">
+				<label>价格</label> 
+				<input id="pricePII" class="easyui-textbox"   data-options="required:true,validType:'number'" >
+			
+			</div>
+			<div id="tips"> </div>
+			<table id="dataPII"></table>  
+	
+	</div>
+	
+	
+	 <div id="purchasePro" class="easyui-dialog" style="width: 450px; height: 500px; padding: 10px 20px" closed="true" modal="true">
+	    <table id="pro"> 
+     <caption id='titlePro'></caption>
+    <tr><th>Id</th><th>批次</th><th>日期</th><th>负责员工</th><th>供应商</th><th>采购状态</th><th>支出</th></tr>
+    <tr><td id='idPro'><td id='batchPro'></td><td id='datePro'></td><td id='empPro'></td>
+    <td id='supplierPro'></td><td id='statusPro'></td><td id="totalPay"></td></tr>
+    <tr><td colspan="7"><p id='logPro'></p></td></tr>
+    <tr> 
+ 
+    </table>
+    
+    <table id="dgPro" title="采购清单" class="easyui-datagrid">
+    </table>  
+	<div id="toolBarPro">
+			<a	href="#dlg" class="easyui-linkbutton" iconCls="icon-add" plain="true"	onclick="openPII()">添加</a> 
+			<a href="#" class="easyui-linkbutton" iconCls="icon-remove" plain="true" onclick="delPI()">删除</a> 
+			 <a href="#" class="easyui-linkbutton" iconCls="icon-edit" plain="true" onclick="putPI()">修改</a>
+
+	</div>
+
+
+    </div>
+    
+        
+
+	
+	
+	
+	
+	
+</body>
+
+	
+</html>

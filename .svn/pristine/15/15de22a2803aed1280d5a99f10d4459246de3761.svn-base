@@ -1,0 +1,414 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()+ path + "/";
+	System.out.print("basePath : " + basePath);
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="<%=path%>/jquery-easyui-1.4.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=path%>/jquery-easyui-1.4.5/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=path%>/jquery-easyui-1.4.5/demo/demo.css">
+<link rel="stylesheet" href="<%=path%>/css/wsk.css">
+<script type="text/javascript" src="<%=path%>/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript" src="<%=path%>/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.datagrid.js"></script>
+<script type="text/javascript" src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.dialog.js"></script>
+<script type="text/javascript" src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.messager.js"></script>
+<script type="text/javascript" src="<%=path%>/js/purchase/purchaseItemAction.js"></script>
+<script type="text/javascript" src="<%=path%>/js/purchase/purchaseValidate.js"></script>
+
+<script type="text/javascript">
+var url = "";// 定义一个全局变量传给id为fm的form提交事件
+
+
+let $purchaseId  = '';
+let $purchaseBatch  = '';
+let $purchaseDate  = '';
+let $purchaseStatus  = '';
+let $purchaseLog  = '';
+let $currentPage  = '';
+let $pageSize  = '';
+let $supplier  = '';
+let $startDate  = '';
+let $endDate  = '';
+let $employee='';
+let $admin='';
+let $UniformResourceLocation='http://'+window.location.host+'/bookstore/';
+
+
+	function doSearch(){ 
+	
+		$.ajax({			
+			url:$UniformResourceLocation+'purchase/dynamicGet',
+			dataType:'json',
+			async:false,
+			data:{
+				
+				purchaseId: $purchaseId,
+				purchaseBatch		:$purchaseBatch,
+				supplier		:$supplier,
+				employee		:$employee,	
+				startDate		:$startDate,
+				endDate	:$endDate,
+				purchaseStatus			:$purchaseStatus,
+				currentPage			:1,
+				pageSize			:10,
+			},
+			success:function(data){
+				transferStatus(data.value.rows);
+				transferEmp(data.value.rows);
+				transferSupplier(data.value.rows) ;
+				$("#dg").datagrid('loadData',data.value);				
+				console.log(data);
+			}
+		});
+		
+   
+	}
+	
+	$(function(){	
+		$("#dg").datagrid({  
+			   onDblClickRow: function (index, row){purchaseProFun(row);} 
+		            });
+		
+		$('#dg').datagrid({    
+	 		 columns:[[    
+	 		 {field:'purchaseId',hidden:true},    
+	 		 {field:'purchaseBatch',title:'采购批次',width:100},    
+	 		 {field:'purchaseDate',title:'采购日期',width:100,align:'center'}   ,
+	 		 {field:'supplier',title:'供应商',width:100,align:'center'}    ,
+	 		 {field:'employee',title:'员工',width:100,align:'center'}    ,
+	 		 {field:'purchaseStatus',title:'采购状态',width:100,align:'center'}  ,
+	 		 {field:'purchaseLog',hidden:true}
+	 		 ]] ,
+	 		 pagination:true,
+	 		 pageList:[5,10,20],
+	 		 fitColumns:true,
+	 		 striped:true,
+	 		 rownumbers:true,
+	 		 singleSelect:true
+	 		 });   
+		
+		doSearch();	
+		
+		// 双击查看详情
+	
+		
+	
+		var pager = $('#dg').datagrid('getPager');	
+		pager.pagination({
+			pageSize:10,
+			pageNumber:1,
+			showPageList:true,
+			onSelectPage:function(pageNumber, pageSize){
+				$.ajax({
+					url:$UniformResourceLocation+'purchase/dynamicGet',
+					dataType:'json',
+					async:false,
+					data:{						
+						purchaseId: $purchaseId,
+						purchaseBatch		:$purchaseBatch,
+						supplier		:$supplier,
+						employee		:$employee,
+						startDate		:$startDate,
+						endDate	:$endDate,
+						purchaseStatus			:$purchaseStatus,
+						currentPage			:pageNumber,
+						pageSize			:pageSize,
+					}, 
+					success:function(data){
+						transferStatus(data.value.rows);
+						transferEmp(data.value.rows);
+						transferSupplier(data.value.rows) ;
+						$("#dg").datagrid('loadData',data.value);
+						console.log(data);
+					}
+				});		
+			}			
+		});
+	});	
+	
+
+	
+	$(function(){
+//		设置查询时间格式
+		$('#startDate').datebox({
+		    onSelect: function(date){
+		        $startDate = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		    }
+		});	
+		$('#endDate').datebox({
+		    onSelect: function(date){
+		        $endDate = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		    }
+		});	
+//查询选框中数据
+		$('#searchBatchC').combobox({
+			url:$UniformResourceLocation+'purchase/getBatch',
+			valueField : 'id',
+			textField : 'text',
+			onSelect : function(record) {
+				$purchaseBatch = record.text;
+			}
+		});
+		$('#postSupplier').combobox({
+			url:$UniformResourceLocation+'supplier/getSupplierOnLine',
+			valueField : 'id',
+			textField : 'text',
+			onSelect : function(record) {
+				$supplier = record.id;
+				$('#postSupplier').val()=record.id;
+			}
+		});
+			
+		$('#addStatus').combobox({
+			onSelect: function(record){
+				$purchaseStatus = record.text;
+			}
+		});	
+
+	})
+	
+	
+
+
+
+
+	
+	function transferStatus(rows) {
+		$.each(rows, function(i, item) {
+			switch (item["purchaseStatus"]) {
+			case 0:
+				item["purchaseStatus"] = "已取消";
+				break;
+			case 1:
+				item["purchaseStatus"] = "计划中";
+				break;
+			case 2:
+				item["purchaseStatus"] = "进行中";
+				break;
+			case 3:
+				item["purchaseStatus"] = "待入库";
+				break;
+			case 4:
+				item["purchaseStatus"] = "已入库";
+				break;
+			default:
+				break;
+			}
+		})
+	}
+
+	function transferEmp(rows) {
+		$.each(rows, function(i, item) {
+			item["employee"] = item["employee"].empName;
+		})
+	}
+	function transferSupplier(rows) {
+		$.each(rows, function(i, item) {
+			item["supplier"] = item["supplier"].supplierName;
+		})
+	}
+
+
+	
+$(function(){
+	
+
+
+ 	function transferStatus(rows){
+		$.each(rows,function(i,item){
+			switch(item["cooperateStatus"])
+			{
+			case 0:
+				item["cooperateStatus"]="未合作";
+				break;
+			case 1:
+				item["cooperateStatus"]="合作中";
+				break;
+			case 2:
+				item["cooperateStatus"]="合作过";
+				break;
+			default:
+				break;
+			}
+			
+			
+		})
+	}
+	
+})
+
+	
+
+
+
+
+
+
+
+function fmReset(){
+	
+	var row=$('#dg').datagrid('getSelected');
+	$('#fm').form('load', row);
+}
+function fmClear(){
+	$('#fm').form('clear');
+}
+function dgClose(){
+$('#postSupplier').dialog('close');
+
+}
+
+</script>
+
+<title>采购管理</title>
+
+</head>
+<body>
+
+<div>
+
+</div>
+	<table id="dg" title="采购信息" class="easyui-datagrid" onClickRow="ClickRow" toolbar="#toolBar" >
+		
+	</table>
+
+	<div id="toolBar">
+	<button  id="searchButton" onclick="doSearch()"  style="width: 100px" >查&nbsp;询</button>
+	&emsp;
+	采购批次
+	<input id="searchBatchC" class="easyui-combobox" style="width: 100px" />
+	&emsp;
+	采购状态
+	<select id="searchStatus" class="easyui-combobox" style="width: 100px;">
+			<option value=''>全部状态</option>
+			<option value='1'>计划中</option>
+			<option value='2'>进行中</option>
+			<option value='3'>已完成</option>
+			<option value='0'>已取消</option>
+   </select> 
+			&emsp;
+		
+			&emsp;
+			 自<input id="startDate" type="text"
+			class="easyui-datebox" style="width: 100px" /> 
+			&ensp;
+			至
+			&ensp;<input
+			id="endDate" type="text" class="easyui-datebox" style="width: 100px" />
+		<br> 
+		
+	</div>
+
+	<div id="PurchaseInfo" class="easyui-dialog" style="width: 500px; height: 280px; padding: 10px 20px" closed="true"  buttons="#dlg-buttons"  modal="true">
+		<div class="ftitle">采购信息</div>
+		<form id="fm" method="post">
+			<div class="fitem">
+			 <input name="purchaseId" type="hidden">
+			</div>
+			<div class="fitem">
+				<label>采购批次:</label> <input name="purchaseBatch" class="easyui-textbox">
+			</div>
+			<div class="fitem" id="purchaseMan">
+				<label>采购人:</label> 
+				<input id="purchaseEmployee" name="employee" class="easyui-textbox"  readonly="true" >
+			</div>
+			<div class="fitem">
+				<label>供应商:</label> 	<input id="postSupplier" name="supplier" class="easyui-combobox" style="width: 100px" />
+			</div>
+			<div class="fitem">
+				<label>采购状态:</label>
+				<select id="searchStatus" class="easyui-combobox" name="purchaseStatus" style="width: 100px;">
+			<option value='1'>计划中</option>
+			<option value='2'>进行中</option>
+			<option value='3'>已完成</option>
+			<option value='0'>已取消</option>
+			</select> 
+			</div>
+			<div class="fitem">
+				<label>采购日期:</label> <input name="purchaseDate" type="text" style="width: 100px;"
+					class="easyui-datebox" >
+			</div>
+			<div class="fitem">
+				<label>采购说明:</label>
+				<textarea name="purchaseLog" > </textarea>
+			</div>
+			
+			
+			
+		</form>
+	
+	</div>
+	
+		<div id="dlg-buttons">
+		
+	
+	 	</div>
+	
+	
+	<div id="PIInfo" class="easyui-dialog"
+		style="width: 400px; height: 280px; padding: 10px 20px" closed="true">
+		<div class="ftitle">条目</div>
+		<div id="buttonPII">
+		<button onclick="appendPII()">添加</button>
+		<button onclick="PIIData()">应用</button>
+		</div>
+		
+			<div class="fitem">
+				<label>商品ID</label>
+				<input id="bookPII" class="easyui-textbox">
+			</div>
+			<div class="fitem">
+				<label>数量</label>
+				 <input id="numberPII" class="easyui-textbox"  data-options="required:true,validType:'money'"  >
+			</div>
+			<div class="fitem">
+				<label>价格</label> 
+				<input id="pricePII" class="easyui-textbox"   data-options="required:true,validType:'number'" >
+			
+			</div>
+			<div id="tips"> </div>
+			<table id="dataPII"></table>  
+	
+	</div>
+	
+	
+	 <div id="purchasePro" class="easyui-dialog" style="width: 800px; height: 500px; padding: 10px 20px; background:rgba(128,128,128,0.3)" closed="true" modal="true">	
+     <h2 style="color:rgba(255,0,0,0.8);text-align:center" id='titlePro'></h2>
+     <div id="profile">
+     <ul id="top1">
+   <li> 批次：<span id='batchPro'></span></li>
+  	<li> 日期：<span id='datePro'></span></li>
+    <li>员工：<span id='empPro'></span></li>
+    </ul>
+    <ul id="top2">
+    <li>供应商：<span id='suppliePro'></span></li>
+    <li>采购状态：<span id='statusPro'></span></li>
+    <li>采购总额：<span id="totalPay"></span></li>
+     </ul>
+     </div>
+    <div id="bottom1">	
+    <table id="dgPro" title="采购清单" class="easyui-datagrid">
+    </table>
+    </div>  
+	<div id="toolBarPro">
+	</div>
+    </div>
+    
+        
+
+	
+	
+	
+	
+	
+</body>
+
+	
+</html>

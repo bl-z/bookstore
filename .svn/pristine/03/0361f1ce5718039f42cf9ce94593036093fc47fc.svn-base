@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.PermissionMapper">
+
+
+	
+
+	<!-- 添加中间表t_admin_permission的信息 -->
+	<insert id="insertAdminPermission">
+		<foreach collection="permissionList" item="permission" separator=";">
+			insert into t_admin_permission(
+			admin_id,permission_id
+			)
+			value(
+			#{adminId},#{permission}
+			)
+		</foreach>
+		
+	</insert>
+	
+	
+	<!-- 删除管理员在中间表t_admin_permission的信息 -->
+	<delete id="deleteAdminPermission">
+		delete from t_admin_permission
+		where admin_id=#{adminId}
+	</delete>
+	
+	<!-- 获取管理员权限信息 -->
+	<select id="getAdminPermission" resultMap="permissionResultMap">
+		select
+		p.permission_id, p.permission_name
+		from t_admin_permission tp, t_permission p
+		where tp.admin_id = #{adminId}
+		and p.permission_id = tp.permission_id;
+	</select>
+	
+	<resultMap type="permission" id="permissionResultMap" >
+  		<id property="permissonId" column="permission_id"/>
+  		<collection property="controls" column="permission_id" ofType="Control" select="com.bs.admin.mapper.ControlMapper.getControllersByPermissionId"/>
+  	</resultMap>
+  	
+	<select id="selectAllPermission" resultMap="permissionResultMap">
+		select permission_id, permission_name 
+		from t_permission;
+	</select>
+
+	<select id="getPermissionById">
+		select permission_id, permission_name 
+		from t_permission
+		where permission_id = #{permissionId}
+	</select>
+	
+<!-- t_permission表的字段 -->
+	<sql id="permissionProperty">
+		permission_id,permission_name
+	</sql>
+
+</mapper>
+  

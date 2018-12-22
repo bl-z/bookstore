@@ -1,0 +1,291 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+    <%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	System.out.print("basePath : "+basePath);
+	%>   
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/demo/demo.css">
+<script type="text/javascript" src="<%=path %>/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.datagrid.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.dialog.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.messager.js"></script>
+<script type="text/javascript" src="<%=path %>/js/myValidate.js"></script>
+<script type="text/javascript" src="<%=path %>/js/validateDemo.js"></script>
+<title>创建活动</title>
+<style type="text/css">
+#fm {
+	margin: 0;
+	padding: 10px 30px;
+}
+.ftitle {
+	font-size: 14px;
+	font-weight: bold;
+	color: #666;
+	padding: 5px 0;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #ccc;
+}
+.fitem {
+	margin-bottom: 5px;
+}
+.fitem label {
+	display: inline-block;
+	width: 80px;
+}
+.easyui-numberbox{
+	width: 75px;
+}
+#newActivity{
+	text-align:center;
+}
+#dlg-buttons{
+	text-align:center;
+}
+</style>
+<script type="text/javascript">
+let $bookName  = '';
+let $bookCategory  = '';
+let $bookStatus = '';
+let $bottomPrice = "";
+let $topPrice = "";
+let $activityName = "";
+let $activityDiscount = "";
+let $activityStart = "";
+let $activityEnd = "";
+function doSearch(){
+	$.ajax({			
+		url:'<%=basePath %>activity/getAllBook/1/10',
+		dataType:'json',
+		async:false,
+		data:{
+			bookName		:$bookName,
+			bookCategory	:$bookCategory,
+			bookStatus		:$bookStatus,
+			bottomPrice		:$bottomPrice,
+			topPrice		:$topPrice,
+		},
+		success:function(data){
+			$("#dg").datagrid('loadData',data);
+		},
+	});
+}
+$(function(){	
+	var pager = $('#dg').datagrid('getPager');	
+	pager.pagination({
+		pageSize:10,
+		pageNumber:1,
+		showPageList:true,
+		onSelectPage:function(pageNumber, pageSize){
+			$.ajax({
+				url:'<%= basePath%>activity/getAllBook/'+pageNumber+'/'+pageSize,
+				dataType:'json',
+				async:false,
+				data:{						
+					bookName		:$bookName,
+					bookCategory	:$bookCategory,
+					bookStatus		:$bookStatus,
+					bottomPrice		:$bottomPrice,
+					topPrice		:$topPrice,
+				}, 
+				success:function(data){
+					$("#dg").datagrid('loadData',data);		
+				}
+			});		
+		}			
+	});
+});	
+</script>
+
+<script type="text/javascript">
+$(function(){
+	// 获取活动名
+	$('#activityName').combobox({
+		url:'<%= basePath%>activity/allActivityName',    
+	    valueField:'text',    
+	    textField:'text',
+		onSelect: function(record){
+			$activityName = record.text;
+		}
+	});
+	// 活动开始日期
+	$('#activityStart').datebox({
+	    onSelect: function(date){
+	        $activityStart = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+	    }
+	});	
+	// 活动结束日期
+	$('#activityEnd').datebox({
+	    onSelect: function(date){
+	        $activityEnd = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+	    }
+	});	
+	// 获取类型
+	$('#bookCategory').combobox({
+		url:'<%= basePath%>bookController/getCategpry',    
+	    valueField:'text',    
+	    textField:'text',
+		onSelect: function(record){
+			$bookCategory = record.text;
+		}
+	});	
+	// 获取书名
+	$('#bookName').combobox({
+		url:'<%= basePath%>activity/allBookName',    
+	    valueField:'text',    
+	    textField:'text',
+		onSelect: function(record){
+			$bookName = record.text;
+		}
+	});
+	// 获取状态
+	$('#bookStatus').combobox({
+		url:'<%= basePath%>bookController/getBookStatus',    
+	    valueField:'text',    
+	    textField:'text',
+		onSelect: function(record){
+			$bookStatus = record.text;
+		}
+	});
+})
+function doSearchButton() {
+	doSearch();
+}
+// 清空
+function clearButton() {
+	$("input").val("");
+	$activityName  = '';
+	$activityDiscount = '';
+	$activityStart = '';
+	$activityEnd = '';
+	$bookName  = '';
+	$bookCategory  = '';
+	$bookStatus = '';
+	$bottomPrice = "";
+	$topPrice = "";
+}
+// 保存
+function saveActivity() {
+	// 定义传输对象
+	var activityData = null;
+	// 定义传输数组
+	var arr = [];
+	// 获取选中行的数据
+	var books = $('#dg').datagrid('getSelections');
+	// 遍历添加
+	for(var i =0;i<books.length;i++){
+		activityData = new Object();
+		activityData.bookId = books[i].bookId;
+		activityData.activityName = $('#activityName').combobox('getText');
+		activityData.activityDiscount = $('#activityDiscount').numberbox('getValue');
+		activityData.activityStart = $activityStart;
+		activityData.activityEnd = $activityEnd;
+		arr.push(activityData);
+	}
+	
+	if(arr.length==0){
+		$.messager.alert("提示", "请填写活动数据并选择书籍！", "info");
+		return;
+   	}else{
+	   console.log(JSON.stringify(arr));
+   	}
+	$.messager.confirm('提示', '是否添加选中数据?', function (r) {
+		if (!r) {
+	    	// 取消删除后,清空数组
+	    	arr = [];
+	    	// 取消选中
+	    	cancel();
+	        return;  
+	    }
+		$.ajax({
+			type : "post",
+			url : '<%= basePath%>activity/addActivity',
+			contentType :"application/json",
+			data :JSON.stringify(arr), 
+			dataType : "json",
+			cache : false,
+			async : false,
+			timeout : 60000,
+			success: function (result) {  
+	            if (result.state=true) {
+	            	// 清空数组
+	                arr = [];
+	                $.messager.alert("提示", "恭喜您，活动创建成功！", "info");
+	                window.location.href ='<%= basePath%>activity/pagination';
+	            } else {  
+	                $.messager.alert("提示", "添加失败，请重新操作！", "info");
+	                cancel();
+	                return;  
+	            }  
+	        }           
+		});
+	});
+}
+//取消 reject
+function cancel(){
+	$('#dg').datagrid('rejectChanges');
+	editIndex = undefined;
+}
+</script>
+</head>
+<body>	
+<div id="addActivity" style="width: 800px; padding: 10px 10px" class="easyui-dialog" buttons="#dlg-buttons">
+<form id="fm" method="post">					
+<table id="dg" class="easyui-datagrid" style="width: 100%; height: 600px" pagination="true" toolbar="#toolbar" rownumbers="true" fitColumns="true" singleSelect="false">
+	<thead>
+		<tr>
+			<th field="ck" data-options="checkbox:true" required ="required"></th>
+			<th data-options="field:'bookId',width:30,hidden:'hidden'">编号</th>
+		    <th data-options="field:'bookName',width:30">书名</th>
+			<th data-options="field:'bookCategory',width:30">类型</th>
+			<th data-options="field:'bookSalesPrice',width:30">售价</th>
+			<th data-options="field:'bookStatus',width:30">状态</th>
+		</tr>
+	</thead>
+</table>
+</form>
+</div>
+<div id="toolbar">
+	<br>	
+			<div id="newActivity">
+			<div class="fitem">
+				<label>活动名称</label>
+				<input id= "activityName" class="easyui-combobox"name="activityName" style="width:173px" required ="required"/>
+			</div>
+			<div class="fitem">
+				<label>折扣额度</label> 
+				<input id="activityDiscount" name="activityDiscount" type="text" class="easyui-numberbox" data-options="min:0,precision:0" style="width:173px" required ="required"/>  
+			</div>
+			<div class="fitem">
+				<label>开始日期</label> 
+				<input id="activityStart" name="activityStart" type= "text" class= "easyui-datebox" required ="required"> 
+			</div>
+			<div class="fitem">
+				<label>结束日期</label> 
+				<input id="activityEnd" name="activityEnd" type= "text" class= "easyui-datebox" required ="required"> 
+			</div>
+</div>
+	<br>
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-search'"onclick="doSearchButton()" style="width: 60px">查询</a>
+	类型<input id="bookCategory" class="easyui-combobox" name="bookCategory" style="width:80px"/>
+	书名<input id="bookName" class="easyui-combobox" name="bookName" style="width:80px"/>
+	价格<input id="bottomPrice" type="text" class="easyui-numberbox" value="" data-options="min:0,precision:2" style="width:80px"/> 
+	  ~<input id="topPrice" type="text" class="easyui-numberbox" value="" data-options="min:0,precision:2" style="width:80px"/>
+	状态<input id="bookStatus" class="easyui-combobox" name="bookStatus" style="width:80px"/>
+	<a href="#" class="easyui-linkbutton" data-options="iconCls:'icon-clear'"onclick="clearButton()" style="width: 60px">清空</a>
+</div>
+<div id="dlg-buttons">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-ok"onclick="saveActivity()">Save</a>
+		<a href="<%= basePath%>activity/pagination" class="easyui-linkbutton" iconCls="icon-cancel">Cancel</a>
+</div>
+</body>
+<script src="//open.sojson.com/common/js/canvas-nest.min.js" count="200" zindex="-2" opacity="0.5" color="47,135,193" type="text/javascript"> 
+</script>
+</html>

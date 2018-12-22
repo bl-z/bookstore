@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.StoreHouseMapper">
+
+<select id="dynamicSelect" resultMap="StoreHouseMap">
+select store_house_id ,store_house_name,store_house_address from t_store_house
+<where>
+<if test="storeHouseId!=null">
+and store_house_id=#{storeHouseId}
+</if>
+<if test="storeHouseName!=null and storeHouseName!=''">
+and store_house_Name like concat('%','${storeHouseName}','%)
+</if>
+<if test="storeHouseAddress!=null and storeHouseAddress!=''">
+store_house_Name like concat('%','${storeHouseAddress}','%)
+</if>
+
+</where>
+</select>
+
+<select id="selectById" resultMap="StoreHouseMap">
+ select store_house_id ,store_house_name,store_house_address from t_store_house where store_house_id=#{storeHouseId}
+</select>
+
+
+<resultMap type="StoreHouse" id="StoreHouseMap" autoMapping="true">
+
+</resultMap>
+</mapper>

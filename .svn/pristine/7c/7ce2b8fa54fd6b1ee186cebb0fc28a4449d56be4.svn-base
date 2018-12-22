@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.bs.admin.mapper.EmployeeMapper">
+  <!-- 通过编号获取 -->
+  <select id="getEmpByEmpId" resultMap="empResultMap">
+  		select <include refid="empProperty"/> 
+  		from t_employee 
+  		where emp_id=#{empId}
+  </select>
+  
+
+  <!-- 通过job_id获取该职位的员工 -->
+  <select id="getEmpByJobId" resultMap="empResultMap">
+  		select <include refid="empProperty"/> 
+  		from t_employee 
+  		where job_id=#{jobId}
+  </select>
+  
+  <!-- 获取所有员工 -->
+  <select id="getAllEmp" resultMap="empResultMap">
+  		select <include refid="empProperty"/> 
+  		from t_employee
+  </select>
+  <!-- 通过部门查询 -->
+  <select id="getEmpByDept" resultMap="empResultMap">
+  		select <include refid="empProperty"/> 
+  		from t_employee 
+  		where emp_dept like concat('%',#{empDept},'%')
+  </select>
+  
+  <!-- 获取所有部门 -->
+    <select id="getAllDept" resultType="java.lang.String">
+  		select emp_dept from t_employee group by emp_dept
+  </select>
+  
+  <!-- 获取所有员工的数量 -->
+  <!-- <select id="getAllCount" resultMap="empResultMap">
+  		select count(*) from t_employee
+  </select> -->
+
+
+  
+  <!-- 插入员工 -->
+  <insert id="createEmp">
+  		insert into t_employee(<include refid="empProperty"/>) 
+  		value(<include refid="empValues"/>)
+  </insert>
+  <!-- 删除员工 -->
+  <delete id="deleteEmp">
+  	delete from t_employee 
+  	where emp_id=#{empId}
+  </delete>
+  <!-- 修改员工 -->
+  <update id="updateEmp" parameterType="employee">
+  	update t_employee 
+  	set 
+  	emp_name=#{empName},
+  	emp_dept=#{empDept},
+  	emp_hire_date=#{empHireDate},
+  	emp_quit_date=#{empQuitDate},
+  	emp_status=#{empStatus},
+  	job_id=#{job.jobId},
+  	bank_account=#{bankAccount} 
+  	where emp_id=#{empId}
+  </update>
+  <resultMap type="employee" id="empResultMap">
+  		<id property="empId" column="emp_id"/>
+  		<association property="job" column="job_id" select="com.bs.admin.mapper.JobMapper.getJobByJobId" />
+  </resultMap>
+  
+  
+  <sql id="empProperty">
+  		emp_id,emp_name,emp_dept,emp_hire_date,emp_quit_date,emp_status,job_id,bank_account
+  </sql>
+  <sql id="empValues">
+  		#{empId},#{empName},#{empDept},#{empHireDate},#{empQuitDate},#{empStatus},#{job.jobId},#{bankAccount} 
+  </sql>
+  
+  </mapper>
+  

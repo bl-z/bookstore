@@ -1,0 +1,158 @@
+package com.bs.admin.dao.impl;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.bs.admin.dao.ActivityDao;
+import com.bs.admin.mapper.ActivityMapper;
+import com.bs.admin.mapper.ActivityPageDataMapper;
+import com.bs.admin.mapper.BookMapper;
+import com.bs.admin.pojo.Activity;
+import com.bs.admin.pojo.ActivityPageData;
+import com.bs.admin.pojo.Book;
+
+@Repository
+public class ActivityDaoImpl implements ActivityDao {
+
+	@Autowired
+	private ActivityMapper am;
+	@Autowired
+	private ActivityPageDataMapper pm;
+	@Autowired
+	private BookMapper bm;
+
+	@Override
+	public List<Activity> getActivityNameByActivity() {
+		return am.getActivityNameByActivity();
+	}
+
+	@Override
+	public List<ActivityPageData> getAllActivityBook() {
+		// 所有的活动类型
+		List<Activity> allActivityBook = am.getAllActivityBook();
+		// 页面数据类型
+		List<ActivityPageData> activityPageDatas = new ArrayList<ActivityPageData>();
+		// 先遍历出bookName
+		Set<Book> books = new HashSet<Book>();
+		for (Activity activity : allActivityBook) {
+			books = activity.getBooks();
+			for (Book book : books) {
+				String bookName = book.getBookName();
+				ActivityPageData activityPageData = new ActivityPageData();
+				// 获取直播
+				activityPageData.setActivityId(activity.getActivityId());
+				activityPageData.setBookName(bookName);
+				activityPageData.setActivityName(activity.getActivityName());
+				activityPageData.setActivityDiscount(activity.getActivityDiscount());
+				activityPageData.setActivityStart(activity.getActivityStart());
+				activityPageData.setActivityEnd(activity.getActivityEnd());
+				// 添加数据
+				activityPageDatas.add(activityPageData);
+			}
+		}
+		return activityPageDatas;
+	}
+
+	@Override
+	public List<ActivityPageData> getActivityPageData(Integer start, Integer end) {
+		return pm.getActivityPageData(start, end);
+	}
+
+	@Override
+	public Integer getActivityPageDataTotal() {
+		return pm.getActivityPageDataTotal();
+	}
+
+	@Override
+	public Integer insertActivity(Activity activity) {
+		return am.insertActivity(activity);
+	}
+
+	@Override
+	public Integer addActiviryBook(Activity activity) {
+		return am.addActiviryBook(activity);
+	}
+
+	@Override
+	public Activity getActivityIdByActivity(Activity activity) {
+		return am.getActivityIdByActivity(activity);
+	}
+
+	@Override
+	public Integer insertActivityBook(Integer activityId, Integer bookId) {
+		return am.insertActivityBook(activityId, bookId);
+	}
+
+	@Override
+	public Integer getIdCountByBookName(ActivityPageData activityPageData) {
+		return pm.getIdCountByBookName(activityPageData);
+	}
+
+	@Override
+	public Integer getBookIdByBookName(String bookName) {
+		return bm.getBookIdByBooKName(bookName);
+	}
+
+	@Override
+	public Integer updateActivityByActivityId(Activity activity) {
+		return am.updateActivityByActivityId(activity);
+	}
+
+	@Override
+	public Integer deleteActivity(Integer activityId) {
+		return am.deleteActivity(activityId);
+	}
+
+	@Override
+	public Integer addCancelActivity(ActivityPageData activityPageData) {
+		return pm.insertCancelActivity(activityPageData);
+	}
+
+	@Override
+	public Integer deleteActivityBook(Integer activityId, Integer bookId) {
+		return am.deleteActivityBook(activityId, bookId);
+	}
+
+	@Override
+	public List<ActivityPageData> getCancelActivity(Integer start, Integer end) {
+		return pm.getCancelActivity(start, end);
+	}
+
+	@Override
+	public Integer getCancelTotal() {
+		return pm.getCancelTotal();
+	}
+
+	@Override
+	public List<ActivityPageData> getAllActivity(Integer start, Integer end, String bookName, String activityName, String activityStart, String activityEnd) {
+		return pm.getAllActivity(start, end, bookName, activityName, activityStart, activityEnd);
+	}
+
+	@Override
+	public Integer getTotal(String bookName, String activityName, String activityStart, String activityEnd) {
+		return pm.getTotal(bookName, activityName, activityStart, activityEnd);
+	}
+
+	@Override
+	public List<Book> getAllBook(String bookName, String bookCategory, String bookStatus, Double bottomPrice,
+			Double topPrice, Integer start, Integer end) {
+		return bm.getAllBook(bookName, bookCategory, bookStatus, bottomPrice, topPrice, start, end);
+	}
+
+	@Override
+	public Integer getAllTotal(String bookName, String bookCategory, String bookStatus, Double bottomPrice,
+			Double topPrice) {
+		return bm.getAllTotal(bookName, bookCategory, bookStatus, bottomPrice, topPrice);
+	}
+
+	@Override
+	public Integer getActivityIdTotal(Integer activityId) {
+		return pm.getActivityIdTotal(activityId);
+	}
+
+}

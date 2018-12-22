@@ -1,0 +1,113 @@
+package com.bs.admin.service.impl;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Repository;
+
+import com.bs.admin.dao.FinancialDao;
+import com.bs.admin.pojo.Financial;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.QueryBoxData;
+import com.bs.admin.service.FinancialService;
+
+@Repository
+public class FinancialServiceImpl implements FinancialService {
+	@Autowired
+	private FinancialDao fd;
+
+	@Override
+	public List<QueryBoxData> getAllStastus() {
+		List<String> statusList = fd.getAllFinancialStatus();
+		List<QueryBoxData> status = new ArrayList<QueryBoxData>();
+		for(int i =0;i<statusList.size();i++) {
+			status.add(new QueryBoxData(i, statusList.get(i), false));
+		}
+		return status;
+	}
+
+	@Override
+	public List<QueryBoxData> getAllTypes() {
+		List<String> typesList = fd.getAllFinancaialTypes();
+		List<QueryBoxData> types = new ArrayList<QueryBoxData>();
+		for(int i =0;i<typesList.size();i++) {
+			types.add(new QueryBoxData(i, typesList.get(i), false));
+		}
+		return types;
+	}
+
+	@Override
+	public List<QueryBoxData> getAllWays() {
+		List<String> waysList = fd.getAllFinancialWays();
+		List<QueryBoxData> ways = new ArrayList<QueryBoxData>();
+		for(int i =0;i<waysList.size();i++) {
+			ways.add(new QueryBoxData(i, waysList.get(i), false));
+		}
+		return ways;
+	}
+
+	@Override
+	public PageData<Financial> getAllFinancial(Integer pageNum, Integer pageSize, String financialStatus,String financialTypes, String financialStart, String financialEnd) {
+		Integer total = fd.getFinancialTotal(financialStatus, financialTypes, financialStart, financialEnd);
+		System.out.println("总条数----->" + total);
+		// 获取开始位置
+		Integer start = (pageNum - 1) * pageSize;
+		// 获取结束位置
+		Integer end = (pageNum <= (total / pageSize)) ? (start + pageSize) : total;
+		System.out.println("end---->" + end);
+		return new PageData<Financial>(fd.getAllFinancial(financialStatus, financialTypes, financialStart, financialEnd, start, end), total);
+	}
+	
+	@Override
+	public Integer addFinancial(Financial financial) {
+		return fd.insertFinancial(financial);
+	}
+
+	@Override
+	public Integer delFinancial(Financial financial) {
+		return fd.delFinancial(financial);
+	}
+
+	@Override
+	public Integer updateFinancial(Financial financial) {
+		return fd.updateFinancial(financial);
+	}
+	
+	// 添加工资支出
+	@Override
+	public Integer addSalaryExpend(Double salary, String empAccount, String empName) {
+		String status ="支出";
+		String type = "工资";
+		String ways = "转账";
+		String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		String details ="支付员工"+empName+"工资"+salary;
+		Financial financial = new Financial(status, type, ways, salary, date, empAccount, details);
+		return fd.insertFinancial(financial);
+	}
+	
+	// 添加采购支出
+	@Override
+	public Integer addPurchaseExpend(Double purchaseMoney, String purchaseAccount, String payWays, String purchserName, String purchaseId) {
+		String status ="支出";
+		String type = "采购";
+		String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		String details =purchserName+"采购"+purchaseId+"支付"+purchaseMoney;	
+		Financial financial = new Financial(status, type, payWays, purchaseMoney, date, purchaseAccount, details);	
+		return fd.insertFinancial(financial);
+	}
+
+	// 添加订单收入
+	@Override
+	public Integer addOrderReveNue(Double orderMoney, String userAccount, String payWays, String userid, String bookName) {		
+		String status ="收入";
+		String type = "售书";
+		String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
+		String details ="用户"+userid+"购买"+bookName+"支付"+orderMoney;			
+		Financial financial = new Financial(status, type, payWays, orderMoney, date, userAccount, details);
+		return fd.insertFinancial(financial);
+	}
+
+}

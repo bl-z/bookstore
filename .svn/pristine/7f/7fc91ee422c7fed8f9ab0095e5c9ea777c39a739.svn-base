@@ -1,0 +1,221 @@
+<%@ page language="java" contentType="text/html; charset=utf-8" pageEncoding="utf-8"%>
+    <%
+	String path = request.getContextPath();
+	String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
+	System.out.print("basePath : "+basePath);
+	%>   
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/themes/icon.css">
+<link rel="stylesheet" type="text/css" href="<%=path %>/jquery-easyui-1.4.5/demo/demo.css">
+<script type="text/javascript" src="<%=path %>/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.datagrid.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.dialog.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.form.js"></script>
+<script type="text/javascript" src="<%=path %>/jquery-easyui-1.4.5/plugins/jquery.messager.js"></script>
+<script type="text/javascript" src="<%=path %>/js/activity/couponUserAction.js"></script>
+<script type="text/javascript" src="<%=path %>/js/myValidate.js"></script>
+<script type="text/javascript" src="<%=path %>/js/validateDemo.js"></script>
+<title>优惠券管理</title>
+<style type="text/css">
+#fm {
+	margin: 0;
+	padding: 10px 30px;
+}
+.ftitle {
+	font-size: 14px;
+	font-weight: bold;
+	color: #666;
+	padding: 5px 0;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #ccc;
+}
+.fitem {
+	margin-bottom: 5px;
+}
+.fitem label {
+	display: inline-block;
+	width: 80px;
+}
+.easyui-numberbox{
+	width: 75px;
+}
+</style>
+<script type="text/javascript">
+	let $couponId = '';
+	let $couponName  = '';
+	let $couponMoney  = '';
+	let $couponNum = '';
+	let $couponStart = '';
+	let $couponEnd = '';
+	let $couponRemainNum = '';
+	let $couponStatus = '';
+	function doSearch(){
+		$.ajax({			
+			url:'<%=basePath %>coupon/allCoupon/1/10',
+			dataType:'json',
+			async:false,
+			data:{
+				couponName			:$couponName,
+				couponStart			:$couponStart,
+				couponEnd			:$couponEnd,
+				couponStatus		:$couponStatus,
+			},
+			success:function(data){
+				$("#dg").datagrid('loadData',data);
+				// 查询完成后清空输入框
+				$("input").val("");
+				$couponName  = '';
+				$couponStart = '';
+				$couponEnd = '';
+				$couponStatus = '';
+			}
+		});
+	} 			
+ 	$(function(){		
+ 		doSearch();
+		var pager = $('#dg').datagrid('getPager');	
+		pager.pagination({
+			pageSize:10,
+			pageNumber:1,
+			showPageList:true,
+			onSelectPage:function(pageNumber, pageSize){
+				$.ajax({
+					url:'<%= basePath%>coupon/allCoupon/'+pageNumber+'/'+pageSize,
+					dataType:'json',
+					async:false,
+					data:{	
+						couponName			:$couponName,
+						couponStart			:$couponStart,
+						couponEnd			:$couponEnd,
+						couponStatus		:$couponStatus,
+						pageNumber			:pageNumber,
+						pageSize			:pageSize
+					}, 
+					success:function(data){
+						$("#dg").datagrid('loadData',data);
+					}
+				});		
+			}			
+		});
+	});	 
+ 	
+ 	
+	 $(function(){
+		$('#couponStart').datebox({
+		    onSelect: function(date){
+		        $couponStart = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		    }
+		});	
+		$('#couponEnd').datebox({
+		    onSelect: function(date){
+		        $couponEnd = date.getFullYear()+"-"+(date.getMonth()+1)+"-"+date.getDate();
+		    }
+		});		
+		
+		$('.ccCouponName').combobox({
+			url:'<%=basePath %>coupon/allCouponName',    
+		    valueField:'text',    
+		    textField:'text',
+			onSelect: function(record){
+				$couponName = record.text;
+				alert(record.text);
+			}
+		});		
+		
+		$('.cccouponStatus').combobox({
+			url:'<%=basePath %>coupon/allStatus',    
+		    valueField:'text',    
+		    textField:'text',
+			onSelect: function(record){
+				$couponStatus = record.text;
+				alert(record.text);
+			}
+		});		
+	})
+</script>
+</head>
+<body>
+	<!-- url="<%=basePath %>coupon/allCoupon/1/10" -->
+	<table id="dg" title="优惠券信息" class="easyui-datagrid" style="width: 100%; height: 100%" pagination="true" toolbar="#toolbar" rownumbers="true" fitColumns="true" singleSelect="false">
+		<thead>
+			<tr>
+				<th field="ck" data-options="checkbox:true"></th>
+				<th field="couponId" width="50">编号</th>
+				<th field="couponName" width="50">优惠券名</th>
+				<th field="couponMoney" width="50">金额</th>
+				<th field="couponNum" width="50">总量</th>
+				<th field="couponStart" width="50">开始时间</th>
+				<th field="couponEnd" width="50">结束时间</th>
+				<th field="couponRemainNum" width="50">余量</th>
+				<th field="couponStatus" width="50">类型</th>
+			</tr>
+		</thead>
+	</table>
+	<div id="toolbar">
+		<input id="ss" class="easyui-searchbox" style="width:100px" data-options="searcher:doSearch,prompt:'请输入关键字',menu:'#searchMenu'"/>
+     优惠券名<input class="ccCouponName" class="easyui-combobox" name="couponName" style="width:100px"/>
+     开始时间<input id="couponStart"  type= "text" class= "easyui-datebox" style="width:100px"/>
+     结束时间<input id="couponEnd"  type= "text" class= "easyui-datebox" style="width:100px"/>
+      类	   型<input class="cccouponStatus" class="easyui-combobox" name="couponStatus" style="width:100px"/>  		
+		<br>	
+		<a href="#" class="easyui-linkbutton" iconCls="icon-nav" plain="true" onclick="newCoupon()">添加优惠券</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-nav" plain="true" onclick="editCoupon()">修改优惠券</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-nav" plain="true" onclick="removeCoupon()">删除优惠券</a>		
+	</div>
+	<div id="searchMenu" style="width:120px">
+		<div></div>
+	</div>
+	<div id="dlg" class="easyui-dialog" style="width: 400px; height: 280px; padding: 10px 20px" closed="true" buttons="#dlg-buttons">
+		<div class="ftitle">优惠券信息</div>
+		<form id="fm" method="post" >
+			<div class="fitem">
+				<label>id</label> 
+				<input name="primaryId" class="easyui-textbox" data-options="readonly:true" >
+			</div>
+			<div class="fitem">
+				<label>编号</label> 
+				<input name="couponId" class="easyui-textbox" data-options="readonly:false" >
+			</div>			
+			<div class="fitem">
+				<label>优惠券名</label>
+				<input class="ccCouponName easyui-textbox" name="couponName" style="width:173px"/>
+			</div>
+			<div class="fitem">
+				<label>金额</label>
+				<input name="couponMoney" type= "text" class="easyui-numberbox" data-options="min:0,precision:0" style="width:173px"/>
+			</div>
+			<div class="fitem">
+				<label>总数</label> 
+				<input name="couponNum" type= "text" class="easyui-numberbox" data-options="min:0,precision:0" style="width:173px"/>  
+			</div>
+			<div class="fitem">
+				<label>开始日期</label> 
+				<input name="couponStart" type= "text" class= "easyui-datebox" required ="required"> 
+			</div>
+			<div class="fitem">
+				<label>结束日期</label> 
+				<input name="couponEnd" type= "text" class= "easyui-datebox" required ="required"> 
+			</div>	
+			<div class="fitem">
+				<label>剩余数量</label> 
+				<input name="couponRemainNum" type="text" class="easyui-numberbox" data-options="min:0,precision:0" style="width:173px"/>  
+			</div>
+			<div class="fitem">
+				<label>类型</label> 
+					<input class="cccouponStatus easyui-textbox" name="couponStatus" style="width:173px"/>
+			</div>						
+		</form>
+	</div>
+	<div id="dlg-buttons">
+		<a href="#" class="easyui-linkbutton" iconCls="icon-ok"onclick="saveCoupon()">Save</a>
+		<a href="#" class="easyui-linkbutton" iconCls="icon-cancel" onclick="javascript:$('#dlg').dialog('close')">Cancel</a>
+	</div>
+</body>
+<script src="//open.sojson.com/common/js/canvas-nest.min.js" count="200" zindex="-2" opacity="0.5" color="47,135,193" type="text/javascript"> 
+</script>
+</html>

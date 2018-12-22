@@ -1,0 +1,50 @@
+package com.bs.admin.mapper;
+
+
+
+import java.util.UUID;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.Supplier;
+import com.bs.admin.service.SupplierService;
+
+public class SupplierTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static SupplierMapper bean;
+	private static SupplierService ss=context.getBean(SupplierService.class);
+	static {
+		bean = context.getBean(SupplierMapper.class);
+	}
+
+	Supplier supplier = new Supplier();
+
+	@Test
+	public void selectBySupplierId() {
+	supplier = bean.selectBySupplierId(4);
+	System.out.println(supplier);
+
+	}
+	@Test
+	public void dynamicGet() {
+		PageData<Supplier> dynamicGet = ss.dynamicGet("", "合作中", "1995-2-3", "2000-5-2", 1, 10);
+		System.out.println(dynamicGet.getTotal());
+		}
+	
+
+	@Test
+	public void deletePurchaseById() {
+
+	}
+	@Test
+	public void uuid() {
+		String replace = UUID.randomUUID().toString().replace("-", "");
+		System.out.println(replace);
+	}
+
+
+
+}

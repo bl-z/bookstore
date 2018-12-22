@@ -1,0 +1,48 @@
+package com.bs.admin.mapper;
+
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.dao.StoreHouseDao;
+import com.bs.admin.pojo.QueryBoxData;
+import com.bs.admin.pojo.StoreHouse;
+import com.bs.admin.service.StoreHouseService;
+
+
+public class StoreHouseTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private StoreHouseMapper shm=context.getBean(StoreHouseMapper.class);
+	private static StoreHouseDao shd = context.getBean(StoreHouseDao.class);
+	private static StoreHouseService shs = context.getBean(StoreHouseService.class);
+	@Test
+	public void getAllCoupon() {
+	List<StoreHouse> s = shm.dynamicSelect(null, null, null);
+	System.out.println(s.size());
+	}
+	@Test
+	public void getComBox() {
+
+		List<StoreHouse> list = shd.dynamicSelect(null, null, null);
+		System.out.println(list.size());
+	}
+	
+/*	public void getComBox1() {
+		
+	PageData<StoreHouse> dynamicGet = shs.d;
+	List<StoreHouse> rows = dynamicGet.getRows();
+		System.out.println(rows.size());
+	}*/
+	
+	@Test
+	public void getComBox1() {
+		
+	List<QueryBoxData> rows = shs.getComBox();
+		System.out.println(rows.size());
+	}
+	
+
+}

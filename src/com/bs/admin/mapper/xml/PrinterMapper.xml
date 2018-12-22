@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.bs.admin.mapper.PrinterMapper">
+
+	<!-- 获取印刷商 -->
+	<select id="getPrinterByPrinterInfo" resultMap="printerResultMap">
+		select  <include refid="printerColumns"/>
+		from t_printer p
+		<trim prefix="where">
+			<if test="null != value">
+				printer_id = #{value} or printer_name like concat('%', #{value}, '%')
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 通过印刷id获取印刷商和印刷信息。多表查询 -->
+	<select id="getPrinterByPrintId" resultMap="printerResultMap">
+		select  <include refid="printerColumns"/>
+		from t_printer p, t_print_info i
+		where p.print_id = i.print_id 
+		and p.print_id = #{printId}
+	</select>
+	
+	<!-- 查询所有印刷商 -->
+	<select id="getAllPrinter" resultMap="printerResultMap">
+		select  <include refid="printerColumns"/>
+		from t_printer p
+	</select>
+	
+	<!-- 修改印刷信息的同时修改印刷商名 -->
+  	<update id="updatePrinter">
+  		update t_printer set printer_name=#{printerName} where print_id=#{printId}
+  	</update>
+  
+  	<!-- 添加印刷商 -->
+	<insert id="createPrinter">
+		insert into t_printer
+		value(0, #{printerName}, #{printId})
+	</insert>
+	
+	<!-- 删除印刷商 -->
+	<delete id="deletePrinter">
+		delete from t_printer where print_id = #{printId}
+	</delete>
+	
+	<!-- 映射 -->
+  <resultMap type="printer" id="printerResultMap" autoMapping="true">
+  		<id property="printerId" column="printer_id"/>
+  		<association property="printInfo" column="print_id" select="com.bs.admin.mapper.PrintInfoMapper.getPrintInfoByPrintId"/>
+  </resultMap>
+  
+  <!-- 印刷商表的字段 -->
+  <sql id="printerColumns">
+  		p.printer_id, p.printer_name, p.print_id
+  </sql>
+
+  
+</mapper>
+
+

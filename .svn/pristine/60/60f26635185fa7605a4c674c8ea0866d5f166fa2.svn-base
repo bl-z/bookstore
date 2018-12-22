@@ -1,0 +1,25 @@
+package com.bs.admin.mapper;
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.Coupon;
+
+public class ActivitTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+
+	@Test
+	public void getAllCoupon() {
+		CouponMapper bean = context.getBean(CouponMapper.class);
+		System.out.println("------------------------------");
+		List<Coupon> coupon = bean.getAllCoupon(0, 10, null, null, null,null);
+		for (Coupon coupon2 : coupon) {
+			System.out.println(coupon2);
+		}
+	}
+	
+
+}

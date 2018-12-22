@@ -1,0 +1,47 @@
+package com.bs.admin.pojo;
+
+public class ActivityBook {
+
+	private Integer activityId;
+	private Integer bookId;
+	private Integer index;
+
+	public Integer getActivityId() {
+		return activityId;
+	}
+
+	public void setActivityId(Integer activityId) {
+		this.activityId = activityId;
+	}
+
+	public Integer getBookId() {
+		return bookId;
+	}
+
+	public void setBookId(Integer bookId) {
+		this.bookId = bookId;
+	}
+
+	public Integer getIndex() {
+		return index;
+	}
+
+	public void setIndex(Integer index) {
+		this.index = index;
+	}
+
+	@Override
+	public String toString() {
+		return "ActivityBook [activityId=" + activityId + ", bookId=" + bookId + ", index=" + index + "]";
+	}
+
+	public ActivityBook(Integer activityId, Integer bookId, Integer index) {
+		this.activityId = activityId;
+		this.bookId = bookId;
+		this.index = index;
+	}
+
+	public ActivityBook() {
+	}
+
+}

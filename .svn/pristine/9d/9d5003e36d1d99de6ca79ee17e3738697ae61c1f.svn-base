@@ -1,0 +1,99 @@
+package com.bs.admin.mapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.BeforeClass;
+import org.junit.Test;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.dao.BookDao;
+import com.bs.admin.pojo.Author;
+import com.bs.admin.pojo.Book;
+import com.bs.admin.pojo.BookModel;
+import com.bs.admin.pojo.OrderModel;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.PrinterModel;
+import com.bs.admin.pojo.WindowInfo;
+import com.bs.admin.service.BookService;
+import com.bs.admin.service.OrderService;
+import com.bs.admin.service.PrinterService;
+
+public class BookMapperTest {
+	
+	private static ClassPathXmlApplicationContext cpx;
+	
+	@BeforeClass 
+	public static void before(){
+		cpx = new ClassPathXmlApplicationContext("application_Context.xml");
+	}
+	
+	/*@Test
+	public void orderTest(){
+		OrderService bean = cpx.getBean(OrderService.class);
+		List<OrderModel> queryOrder = bean.queryOrder("1010001867878445", "", 0.00, 0.00, 1, 10);
+		System.out.println("queryOrder：" + queryOrder);
+	}
+	
+	@Test
+	public void orderTest1(){
+		OrderService bean = cpx.getBean(OrderService.class);
+		Integer daleteOrder = bean.daleteOrder("123");
+		System.out.println("daleteOrder：" + daleteOrder);
+	}
+	
+	@Test
+	public void orderTest2(){
+		OrderService bean = cpx.getBean(OrderService.class);
+		Integer updateOrder = bean.updateOrder("1000001961768664", "运输中", 20.00, "鹅", "123456789", "和", "哎", "哟", "喂");
+		System.out.println("updateOrder：" + updateOrder);
+	}*/
+	
+	@Test
+	public void test(){
+		OrderService bean = cpx.getBean(OrderService.class);
+		List<WindowInfo> orderWinInfo = bean.getOrderWinInfo("1000001799992666");
+		System.out.println("---：" + orderWinInfo);
+	}
+	
+	@Test
+	public void status(){
+		BookMapper bean = cpx.getBean(BookMapper.class);
+		String[] s = {"在售", "下架"};
+		for(int i = 80;i < 91; i++){
+			int a = (int)((Math.random()*2));
+			bean.update(s[a], i);
+		}
+		System.out.println("ok");
+	}
+	
+	@Test
+	public void author(){
+		BookService bean = cpx.getBean(BookService.class);
+		PageData<BookModel> bookData = bean.getBookData(null, null, null, null, null,null, 1, 10, "刘");
+//		List<Book> retrieveBookByBookInfo = bean.retrieveBookByBookInfo(null, null, null, null, null, null, 1, 10, "刘");
+//		List<Book> bookByBookInfo = bean.getBookByBookInfo(null, null, null, null, null, null, 0, 10, "12");
+//		Author author = new Author(null, "刘", null);
+//		List<Author> authorByAuthorInfo = bean.getAuthorByAuthorInfo(author);
+		System.out.println("bookData：" + bookData);
+	}
+	
+	@Test
+	public void print(){
+		PrinterService bean = cpx.getBean(PrinterService.class);
+		List<PrinterModel> printerByPrintId = bean.getPrinterByPrintId(1);
+		System.out.println("printerByPrintId："+printerByPrintId);
+	}
+
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

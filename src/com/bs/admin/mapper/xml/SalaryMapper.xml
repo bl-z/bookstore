@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.SalaryMapper">
+	<!-- 获取所有薪资信息 -->
+	<select id="getAllSalary" resultMap="salaryResultMap">
+		select
+		<include refid="salaryColumns" />,salary_status
+		from t_salary
+	</select>
+	
+	<!-- 通过id获取薪资信息 -->
+	<select id="getSalaryById" resultMap="salaryResultMap">
+		select
+		<include refid="salaryColumns" />
+		from t_salary
+		where salary_id = #{salaryId};
+	</select>
+	<!-- 获取所有未发放的工资 -->
+	<select id="getUnfinishedSalary" resultMap="salaryResultMap">
+		select
+		<include refid="salaryColumns" />
+		from t_salary
+		where salary_status = false
+	</select>
+<!-- 通过员工id和时间获取 -->
+	<select id="getSalaryByEmpIdAndDate" resultMap="salaryResultMap">
+		select
+		<include refid="salaryColumns" />
+		from t_salary
+		where emp_id=#{empId} and month(salary_date)=month(#{salaryDate})
+	</select>
+<!-- 查询指定时间段内所有薪资信息 -->
+	<select id="getAllSalaryByDate" resultMap="salaryResultMap">
+		select
+		<include refid="salaryColumns" />
+		from t_salary
+
+		<where>
+			<if test="date1 != null and date2 != null">and salary_date between #{date1} and #{date2}</if>
+		</where>
+
+	</select>
+	<sql id="salaryColumns">
+		salary_id,emp_id,salary_date,other,admin_id
+	</sql>
+	<sql id="salaryValues">
+		#{salaryId},#{employee.empId},#{salaryDate},#{other},#{operator.adminId}
+	</sql>
+
+	<resultMap type="salary" id="salaryResultMap">
+		<id property="salaryId" column="salary_id" />
+		<association property="employee" column="emp_id"
+			select="com.bs.admin.mapper.EmployeeMapper.getEmpByEmpId" />
+		<association property="operator" column="admin_id"
+			select="com.bs.admin.mapper.AdminMapper.getAdminByAdminId" />
+	</resultMap>
+<!-- 添加薪资信息 -->
+	<insert id="createSalary">
+		insert into t_salary
+		(
+		<include refid="salaryColumns" />
+		)
+		value
+		(
+		<include refid="salaryValues" />
+		)
+	</insert>
+<!-- 删除薪资 -->
+	<delete id="deleteSalary">
+		delete from t_salary
+		where salary_id=#{salaryId}
+	</delete>
+	<!-- 修改工资状态 -->
+	<update id="updateSalaryStatus" parameterType="salary">
+  	update t_salary 
+  	set 
+  	salary_status = #{salaryStatus}
+  	where salary_id=#{salaryId}
+  </update>
+</mapper>

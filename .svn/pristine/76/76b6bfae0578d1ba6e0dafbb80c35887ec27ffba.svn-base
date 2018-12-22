@@ -1,0 +1,73 @@
+var url = "";// 定义一个全局变量传给id为fm的form提交事件
+/* var data = {}; */
+
+function newCoupon() {
+	$('#dlg').dialog('open').dialog('setTitle',
+			'添加优惠券&nbsp;&nbsp;!当已存在此种优惠券,不可再添加');
+	$('#fm').form('clear');
+	url = '/bookstore/coupon/addCoupon';
+}
+function editCoupon() {
+	// datagrid的getSelected方法是返回数据网格的第一个选中的行或者 null。
+	var row = $('#dg').datagrid('getSelected');
+	if (row) {
+		$('#dlg').dialog('open').dialog('setTitle', '修改优惠券&nbsp;&nbsp;!只可修改数量');
+		$('#fm').form('load', row);
+		url = '/bookstore/coupon/updateCoupon';
+	}
+}
+
+// id为fm的form的提交事件，由用户信息编辑对话框的确定按钮点击触发
+function saveCoupon() {
+	// easyui对ajax的封装
+	$('#fm').form('submit', {
+		url : url,
+		onSubmit : function() {
+			// 进行表单字段验证，当全部字段都有效时返回 true 。该方法和 validatebox 插件一起使用。
+			return $('#fm').form('validate');// jquery $("#")
+			// $('#fm').form('validate')
+			// 会去调用验证框架进行验证，然后对所有easyui-validateBox验证结果进行与操作，全部ok表单才可以提交
+		},
+		success : function(result) {
+			alert("成功");
+			var result = eval('(' + result + ')');// 数据解析，如果是json数据就解析成json
+			if (result.state==true) {
+				window.location.reload();
+				alert(result);
+				$('#dlg').dialog('close'); // close the dialog
+				$('#dg').datagrid('reload'); // reload the user data
+			}
+			$.messager.show({
+				title : '提示消息',
+				msg : result.msg
+			});
+		}
+	});
+}
+// 删除用户的方法
+function removeCoupon() {
+	var row = $('#dg').datagrid('getSelected');
+	if (row) {
+		$.messager.confirm('Confirm', '确定要删除优惠券?', function(cfm) {
+			if (cfm) {
+				// $.post(url,data,success(data, textStatus,xhr),dataType)
+				$.post('/bookstore/coupon/delCoupon', {
+					primaryId : row.primaryId,
+				},
+
+				function(result) {
+					if (result.state == true) {
+						window.location.reload();
+						$('#dg').datagrid('reload'); // reload the user data
+					}
+					$.messager.show({ // show error message
+						title : '提示消息',
+						msg : result.msg
+					});
+
+				}, 'json'// 返回的数据类型
+				);
+			}
+		});
+	}
+}

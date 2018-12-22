@@ -1,0 +1,273 @@
+package com.bs.admin.controller;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import com.alibaba.fastjson.JSON;
+import com.bs.admin.pojo.ActivityPageData;
+import com.bs.admin.pojo.BookData;
+import com.bs.admin.pojo.QueryBoxData;
+import com.bs.admin.service.ActivityService;
+import com.bs.admin.service.BookService;
+import com.bs.admin.util.DateUtil;
+import com.bs.admin.util.EffectRow;
+import com.bs.admin.util.JsonData;
+
+@Controller
+@RequestMapping(value = "activity")
+public class ActivityController {
+	@Autowired
+	private ActivityService as;
+	@Autowired
+	private BookService bs;
+
+	/**
+	 *    转到页面
+	 * 
+	 * @return 转到活动管理页面
+	 */
+	@RequestMapping("pagination")
+	public String toEmpPage() {
+		System.out.println("---------进入pagination，转到活动管理页---------");
+		return "ActivityManagement";
+	}
+
+	/**
+	 *   获取活动名
+	 * 
+	 * @return 活动名的json数据
+	 */
+	@RequestMapping(value = "allActivityName", produces = "text/html;charset=UTF-8")
+	public @ResponseBody String allActivityName() {
+		List<String> allActivityName = as.getActivityNameByActivity();
+		List<QueryBoxData> allActivityNameData = new ArrayList<QueryBoxData>();
+		for (int i = 0; i < allActivityName.size(); i++) {
+			allActivityNameData.add(new QueryBoxData(i, allActivityName.get(i), false));
+		}
+		return JSON.toJSONString(allActivityNameData);
+	}
+
+	/**
+	 *   获取书名
+	 * 
+	 * @return 书名的json数据
+	 */
+	@RequestMapping(value = "allBookName", produces = "text/html;charset=UTF-8")
+	public @ResponseBody String allBookName() {
+		List<String> allBookName = bs.getBookName();
+		List<QueryBoxData> allBookNameData = new ArrayList<QueryBoxData>();
+		for (int i = 0; i < allBookName.size(); i++) {
+			allBookNameData.add(new QueryBoxData(i, allBookName.get(i), false));
+		}
+		return JSON.toJSONString(allBookNameData);
+	}
+	
+	/**
+	 * 查询活动
+	 * 
+	 * @return 页面json数据
+	 */
+	@RequestMapping(value = "allActivityBook/{pageNum}/{pageSize}", produces = "text/html;charset=UTF-8")
+	public @ResponseBody String allActivity(
+			@RequestParam("bookName") String bookName,
+			@RequestParam("activityName") String activityName,
+			@RequestParam("activityStart") String activityStart,
+			@RequestParam("activityEnd") String activityEnd,
+			@PathVariable("pageNum") Integer pageNum,
+			@PathVariable("pageSize") Integer pageSize) {
+		 	System.out.println("--------------进入到查询活动------------");
+		return JSON.toJSONString(as.getAllActivity(pageNum, pageSize, bookName, activityName, activityStart, activityEnd));
+	}
+	
+	/**
+	 *   添加活动(不同条件添加)
+	 * 
+	 *  判断bookName是否为空
+	 * 
+	 * 1. 为空---->判断活动表中有无此活动 --a. 有此活动,不可添加 --b. 无此活动,直接添加
+	 * 
+	 * 2. 不为空---->判断表中有无此书此类型的活动 --a. 有,不可添加 --b. 无,添加活动 ------>(1). 添加活动数据---(2). 查询出此次活动的id---(3).查出书的id---(4).添加中间表数据
+	 */
+	@RequestMapping(value = "addActivity", produces = "application/json;charset=utf-8")
+	public @ResponseBody JsonData addActivity(
+			@RequestParam("bookName") String bookName,
+			@RequestParam("activityName") String activityName,
+			@RequestParam("activityDiscount")Integer activityDiscount,
+			@RequestParam("activityStart") String activityStart,
+			@RequestParam("activityEnd") String activityEnd) {	
+		String dateActivityStart = DateUtil.changeDateString(activityStart);
+		String dateActivityEnd = DateUtil.changeDateString(activityEnd);			
+		return as.addActivity(bookName, activityName, activityDiscount, dateActivityStart, dateActivityEnd);					
+	}
+	
+	/**
+	 *	修改活动
+	 * 
+	 *@return JsonData
+	 */
+	@RequestMapping(value = "updateActivity", produces="application/json;charset=utf-8")
+	public @ResponseBody JsonData updateActivity(
+			@RequestParam("activityId") Integer activityId,
+			@RequestParam("bookName") String bookName,
+			@RequestParam("activityName") String activityName,
+			@RequestParam("activityDiscount")Integer activityDiscount,
+			@RequestParam("activityStart") String activityStart,
+			@RequestParam("activityEnd") String activityEnd) {		
+		String dateActivityStart = DateUtil.changeDateString(activityStart);
+		String dateActivityEnd = DateUtil.changeDateString(activityEnd);	
+		Integer update = as.updateActivity(new ActivityPageData(activityId, bookName, activityName, activityDiscount, dateActivityStart, dateActivityEnd));	
+		if(update!=null) {
+			return new JsonData("update", update, "修改成功", true);
+		}else {
+			return new JsonData("update", update, "修改失败", false);
+		}		
+	}
+	
+	/**
+	 * 删除活动
+	 * 
+	 * @return JsonData
+	 */
+	@RequestMapping(value = "delActivity", produces="application/json;charset=utf-8")
+	public @ResponseBody JsonData delActivity(
+			@RequestParam("activityId") Integer activityId ,
+			@RequestParam("bookName")String bookName,
+			@RequestParam("activityName") String activityName,
+			@RequestParam("activityDiscount")Integer activityDiscount,
+			@RequestParam("activityStart") String activityStart,
+			@RequestParam("activityEnd") String activityEnd){				
+		return as.deleteActivity(new ActivityPageData(activityId, bookName, activityName, activityDiscount, activityStart, activityEnd));
+	}
+	
+	/**  
+	
+	 * <p>Title: cancel</p>  
+	
+	 * <p>Description: 查询取消的活动</p>  
+	
+	 * @param pageNum
+	 * @param pageSize
+	 * @return  取消的活动的集合
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	@RequestMapping(value = "cancel/{pageNum}/{pageSize}", produces = "text/html;charset=UTF-8")
+	public @ResponseBody String cancel(
+			@PathVariable("pageNum") Integer pageNum,
+			@PathVariable("pageSize") Integer pageSize){	
+	return JSON.toJSONString(as.getCancleActivity(pageNum, pageSize));	
+	}
+	
+ 
+	/**
+	 * <p>Title: 页面直接编辑提交过来的数据</p>  
+	
+	 * <p>Description: 将页面传递过来的数组遍历</p>  
+	
+	 * @param effectRow json对象数组
+	 * @return 批量修改
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	@PostMapping("commit")
+	public @ResponseBody JsonData commit(@RequestBody EffectRow<ActivityPageData> effectRow) {
+		System.out.println("------------进入到commit-------------");
+		//获取编辑数据 这里获取到的是json字符串
+		List<ActivityPageData> updatedData = effectRow.getUpdated();
+		for (ActivityPageData activity : updatedData) {
+			Integer update = as.updateActivity(activity);
+			if(update!=null) {
+				return new JsonData("update", update, "修改成功", true);
+			}else {
+				return new JsonData("update", update, "修改失败", false);
+			}
+		}
+		return null;	
+	}
+		
+	/**  
+	
+	 * <p>Title: createActivity</p>  
+	
+	 * <p>Description: 进入到创建活动页面</p>  
+	
+	 * @return 活动页面jsp
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	@RequestMapping(value = "create")
+	public String createActivity() {
+		System.out.println("--------创建活动-------");
+		return "CreateActivity";	
+	}
+	
+	/**  
+	
+	 * <p>Title: getAllBook</p>  
+	
+	 * <p>Description: 添加活动时获取书的页面数据</p>  
+	
+	 * @param bookName 		书名
+	 * @param bookCategory 	类型
+	 * @param bookStatus 	状态
+	 * @param bottomPrice 	最低价
+	 * @param topPrice 		最高价
+	 * @param pageNum 		页数
+	 * @param pageSize		每页数据
+	 * @return  			json数据
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	@RequestMapping(value = "getAllBook/{pageNum}/{pageSize}", produces = "text/html;charset=UTF-8")
+	public @ResponseBody String getAllBook(
+			@RequestParam("bookName") String bookName,
+			@RequestParam("bookCategory") String bookCategory,
+			@RequestParam("bookStatus") String bookStatus,
+			@RequestParam("bottomPrice") Double bottomPrice,
+			@RequestParam("topPrice") Double topPrice,
+			@PathVariable("pageNum") Integer pageNum,
+			@PathVariable("pageSize") Integer pageSize) {
+		System.out.println("----------查询所有书---------");
+		return JSON.toJSONString(as.getAllBook(bookName, bookCategory, bookStatus, bottomPrice, topPrice, pageNum, pageSize));
+	}
+	
+	/**  
+	
+	 * <p>Title: insertActivity</p>  
+	
+	 * <p>Description: </p>  
+	
+	 * @param bookData
+	 * @return  
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	@RequestMapping(value = "insertActivity",produces = "application/json;charset=UTF-8")
+	public @ResponseBody JsonData insertActivity(
+			@RequestBody BookData bookData) {	
+		System.out.println("--------批量添加活动-------");
+		return as.insertActivity(bookData);	
+	}
+	
+	/**  
+	
+	 * <p>Title: deleteActivity</p>  
+	
+	 * <p>Description: </p>  
+	
+	 * @param ap
+	 * @return  JsonData结果集
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	@RequestMapping(value = "deleteActivity",produces = "application/json;charset=UTF-8")
+	public @ResponseBody JsonData deleteActivity(
+			@RequestBody List<ActivityPageData> ap) {	
+		System.out.println("--------批量删除活动-------");
+		System.out.println(ap.size());
+		return as.deleteActivity(ap);
+	}
+}

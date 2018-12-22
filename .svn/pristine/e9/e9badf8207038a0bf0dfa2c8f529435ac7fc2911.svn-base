@@ -1,0 +1,117 @@
+package com.bs.admin.pojo;
+
+/**
+ * 
+ * <p>
+ * Title: CouponGet
+ * </p>
+ * 
+ * <p>
+ * Description:
+ * </p>
+ * 获取优惠券的类
+ * 
+ * @author 赵宝林
+ * 
+ *         <p>
+ * @date 2018年11月21日
+ *       </p>
+ * 
+ */
+public class UserGetCoupon {
+
+	private Integer couponGetId;
+	private Integer userId;
+	private Integer couponId;
+	private String couponGetTime;
+	private Boolean couponUseStatus;
+	private String couponUseTime;
+
+	public Integer getCouponGetId() {
+		return couponGetId;
+	}
+
+	public void setCouponGetId(Integer couponGetId) {
+		this.couponGetId = couponGetId;
+	}
+
+	public Integer getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	public Integer getCouponId() {
+		return couponId;
+	}
+
+	public void setCouponId(Integer couponId) {
+		this.couponId = couponId;
+	}
+
+	public String getCouponGetTime() {
+		return couponGetTime;
+	}
+
+	public void setCouponGetTime(String couponGetTime) {
+		this.couponGetTime = couponGetTime;
+	}
+
+	public Boolean getCouponUseStatus() {
+		return couponUseStatus;
+	}
+
+	public void setCouponUseStatus(Boolean couponUseStatus) {
+		this.couponUseStatus = couponUseStatus;
+	}
+
+	public String getCouponUseTime() {
+		return couponUseTime;
+	}
+
+	public void setCouponUseTime(String couponUseTime) {
+		this.couponUseTime = couponUseTime;
+	}
+
+	@Override
+	public String toString() {
+		return "UserGetCoupon [couponGetId=" + couponGetId + ", userId=" + userId + ", couponId=" + couponId
+				+ ", couponGetTime=" + couponGetTime + ", couponUseStatus=" + couponUseStatus + ", couponUseTime="
+				+ couponUseTime + "]";
+	}
+
+	public UserGetCoupon(Integer userId, Integer couponId, String couponGetTime, Boolean couponUseStatus,
+			String couponUseTime) {
+		super();
+		this.userId = userId;
+		this.couponId = couponId;
+		this.couponGetTime = couponGetTime;
+		this.couponUseStatus = couponUseStatus;
+		this.couponUseTime = couponUseTime;
+	}
+
+	public UserGetCoupon(Integer userId, Boolean couponUseStatus, String couponUseTime) {
+		super();
+		this.userId = userId;
+		this.couponUseStatus = couponUseStatus;
+		this.couponUseTime = couponUseTime;
+	}
+
+	public UserGetCoupon(Integer couponGetId, Integer userId, Integer couponId, String couponGetTime,
+			Boolean couponUseStatus, String couponUseTime) {
+		super();
+		this.couponGetId = couponGetId;
+		this.userId = userId;
+		this.couponId = couponId;
+		this.couponGetTime = couponGetTime;
+		this.couponUseStatus = couponUseStatus;
+		this.couponUseTime = couponUseTime;
+	}
+
+	public UserGetCoupon() {
+
+	}
+
+}

@@ -1,0 +1,11 @@
+package com.bs.admin.mapper;
+
+
+import com.bs.admin.pojo.StoreHouse;
+
+public interface StoreHouseMapper {
+	
+	
+	StoreHouse selectById(Integer StoreHouseId);
+
+}

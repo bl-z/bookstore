@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.ActivityMapper">
+	<!-- 查询所有活动的名字 -->
+	<select id="getActivityNameByActivity" resultMap="activityResultMap">
+		select
+		distinct(activity_name)
+		from t_activity
+	</select>
+	<!-- 查询所有活动 -->
+	<select id="getActivityData" resultMap="activityResultMap">
+		select
+		activity_id,activity_name,activity_discount,activity_start,activity_end
+		from t_activity
+	</select>
+	<!-- 添加活动 -->
+	<insert id="insertActivity">
+		insert into t_activity
+		(activity_name,activity_discount,activity_start,activity_end)
+		values
+		(#{activityName},#{activityDiscount},#{activityStart},#{activityEnd})
+	</insert>
+	<!-- 通过活动数据获取activity_id -->
+	<select id="getActivityIdByActivity" resultMap="activityResultMap">
+		select
+		activity_Id
+		from t_activity where 
+		activity_name = #{activityName} and
+		activity_discount = #{activityDiscount} and
+		activity_start =#{activityStart} and
+		activity_end = #{activityEnd}
+	</select>
+	<!-- 修改活动 -->
+	<update id="updateActivityByActivityId">
+		update t_activity
+		<set>
+			<if test="null!=activityName and activityName!=''">
+				activity_name = #{activityName},
+			</if>
+			<if test="null!=activityDiscount and activityDiscount!=''">
+				activity_discount = #{activityDiscount},
+			</if>
+			<if test="null!=activityStart and activityStart!=''">
+				activity_start =#{activityStart},
+			</if>
+			<if test="null!=activityEnd and activityEnd!=''">
+				activity_end = #{activityEnd}
+			</if>
+		</set>
+		where activity_id = #{activityId}
+	</update>	
+	<!-- 删除活动 -->
+	<delete id="deleteActivity">
+		delete from t_activity
+		where activity_id = #{activityId}	
+	</delete>
+	<!-- 添加中间表 -->	
+	<insert id="insertActivityBook">
+		insert into t_activity_books
+		(activity_id,book_id)
+		values
+		(#{activityId},#{bookId})
+	</insert>
+	<!-- 删除中间表 -->
+	<delete id="delActivityBook">
+		delete from t_activity_books
+		where activity_id = #{activityId}
+		and
+		book_id = #{bookId}
+	</delete>
+	
+	<resultMap type="activity" id="activityResultMap" autoMapping="true">
+	</resultMap>
+	
+	<sql id="activityColumns">a.activity_id,a.activity_name,a.activity_discount,a.activity_start,a.activity_end
+	</sql>
+	<sql id="activityValues">#{activityId},#{activityName},#{activityDiscount},#{activityStart},#{activityEnd}
+	</sql>
+</mapper>

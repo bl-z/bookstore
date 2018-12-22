@@ -1,0 +1,52 @@
+package com.bs.admin.service;
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.dao.StoreHouseDao;
+import com.bs.admin.mapper.SupplierMapper;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.QueryBoxData;
+import com.bs.admin.pojo.StoreHouse;
+import com.bs.admin.pojo.Supplier;
+import com.github.pagehelper.PageInfo;
+
+public class SupplierServiceTest {
+
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static SupplierMapper bean;
+
+	static {
+		bean = context.getBean(SupplierMapper.class);
+	}
+
+	/**
+	 * 
+	 * <p>
+	 * Title: deletePurchaseById
+	 * </p>
+	 * 
+	 * <p>
+	 * Description: 动态查询的测试
+	 * </p>
+	 * 
+	 * <p>
+	 * @date 2018年12月2日
+	 * </p>
+	 */
+	@Test
+	public void deletePurchaseById() {
+
+		SupplierService ss = context.getBean(SupplierService.class);
+
+		PageData<Supplier> dynamicGet = ss.dynamicGet("", "", "", "", 1, 10);
+		dynamicGet.getRows();
+		dynamicGet.getTotal();
+	}
+
+
+
+}

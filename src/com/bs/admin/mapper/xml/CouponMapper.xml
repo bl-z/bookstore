@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.CouponMapper">
+	<!-- 查询所有的名字 -->
+	<select id="getAllCouponName" resultMap="CouponResultMap">
+		select
+		distinct(coupon_name)
+		from
+		t_coupon
+	</select>
+	<!-- 查询所有的类型 -->
+	<select id="getAllCouponStatus" resultMap="CouponResultMap">
+		select
+		distinct(coupon_status)
+		from t_coupon
+	</select>
+	<!-- 发放优惠券 -->
+	<insert id="insertCoupon">
+		insert into t_coupon
+		(
+		<include refid="couponColumns" />
+		)
+		values
+		(
+		<include refid="couponValues" />
+		)
+	</insert>
+	<!-- 查询所有的优惠券 -->
+	<select id="getAllCoupon" resultMap="CouponResultMap">
+		select
+		<include refid="couponAllColumns" />
+		from t_coupon
+		<where>
+			<if test="couponName!=null and couponName!='' ">
+				coupon_name = #{couponName}
+			</if>
+			<if test="null!=couponStart and couponStart!='' and null!= couponEnd and couponEnd!=''">
+				and coupon_start &gt;= #{couponStart}
+				and coupon_end &lt;= #{couponEnd}
+			</if>
+			<if test="null!=couponStatus and couponStatus!=''">
+				and coupon_status = #{couponStatus}
+			</if>
+		</where>
+		<if test="null!=start and null!= end">
+			LIMIT #{start},#{end}
+		</if>
+	</select>
+	<!-- 查询此类优惠券 -->
+	<select id="getCouponIdByCoupon" resultMap="CouponResultMap">
+		select coupon_id from
+		t_coupon
+		<where>
+			<if test="couponName!=null and couponName!=''">
+				and coupon_name = #{couponName}
+			</if>
+			<if test="couponMoney!=null and couponMoney!=''">
+				and coupon_money = #{couponMoney}
+			</if>
+			<if test="couponNum!=null and couponNum!=''">
+				and coupon_num = #{couponNum}
+			</if>
+			<if test="null!=couponStart and couponStart!=''">
+				and coupon_start = #{couponStart}
+			</if>
+			<if test="null!= couponEnd and couponEnd!=''">
+				and coupon_end = #{couponEnd}
+			</if>
+			<if test="null!=couponRemainNum and couponRemainNum!=''">
+				and coupon_remain_num = #{couponRemainNum}
+			</if>
+			<if test="null!=couponStatus and couponStatus!=''">
+				and coupon_status = #{couponStatus}
+			</if>
+		</where>
+	</select>
+	<!-- 查询总条数 -->
+	<select id="getCouponTotal" resultType="java.lang.Integer">
+		SELECT count(*) from
+		t_coupon
+		<where>
+			<if test="couponName!=null and couponName!=''">
+				coupon_name = #{couponName}
+			</if>
+			<if test="null!=couponStart and couponStart!='' and null!= couponEnd and couponEnd!=''">
+				and coupon_start &gt;= #{couponStart}
+				and coupon_end &lt;= #{couponEnd}
+			</if>
+			<if test="null!=couponStatus and couponStatus!=''">
+				and coupon_status = #{couponStatus}
+			</if>
+		</where>
+	</select>
+	<!-- 修改优惠券的数量 -->
+	<update id="updateCouponByCoupon">
+		update t_coupon
+		<set>
+			<if test="null!=couponNum and couponNum!=''">
+				coupon_num = #{couponNum},
+			</if>
+			<if test="null!=couponRemainNum and couponRemainNum!=''">
+				coupon_remain_num = #{couponRemainNum},
+			</if>
+			<if test="null!=couponStart and couponStart!=''">
+				coupon_start = #{couponStart},
+			</if>
+			<if test="null!=couponEnd and couponEnd!=''">
+				coupon_end = #{couponEnd}
+			</if>
+		</set>
+		where coupon_id = #{couponId}
+	</update>
+	<!-- 通过id查询优惠券 -->
+	<select id="getCouponByCouponId" resultMap="CouponResultMap">
+		select
+		<include refid="couponAllColumns" />
+		from t_coupon where
+		coupon_id = #{couponId}
+	</select>
+	<!-- 删除优惠券 -->
+	<delete id="delCoupon">
+		delete from t_coupon
+		where coupon_id = #{couponId}
+	</delete>
+
+	<resultMap type="coupon" id="CouponResultMap"
+		autoMapping="true">
+	</resultMap>
+	<sql id="couponColumns">coupon_name,coupon_money,coupon_num,coupon_start,coupon_end,coupon_remain_num,coupon_status
+	</sql>
+	<sql id="couponValues">#{couponName},#{couponMoney},#{couponNum},#{couponStart},#{couponEnd},#{couponRemainNum},#{couponStatus}
+	</sql>
+	<sql id="couponAllColumns">coupon_id,coupon_name,coupon_money,coupon_num,coupon_start,coupon_end,coupon_remain_num,coupon_status
+	</sql>
+	<sql id="couponAllValues">#{couponId},#{couponName},#{couponMoney},#{couponNum},#{couponStart},#{couponEnd},#{couponRemainNum}，#{couponStatus}
+	</sql>
+</mapper>

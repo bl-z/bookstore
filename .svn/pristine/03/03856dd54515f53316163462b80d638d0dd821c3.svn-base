@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.AttendanceMapper">
+
+<resultMap type="attendance" id="attendanceMap">
+	<id property="attendanceId" column="attendance_id"/>
+	<association property="emp" column="emp_id" select="com.bs.admin.mapper.EmployeeMapper.getEmpByEmpId"/>
+	<association property="operator" column="admin_id" select="com.bs.admin.mapper.AdminMapper.getAdminByAdminId"/>
+</resultMap>
+<sql id="attendanceProperty">
+	attendance_id,emp_id,work_day,leave_day,late_day,early_day,att_date,admin_id
+</sql>
+<!-- 获取所有考勤信息 -->
+<select id="getAllAttendance" resultMap="attendanceMap">
+	select <include refid="attendanceProperty"/>
+	from t_attendance
+</select>
+<!-- 通过员工id和日期获取当月考勤信息 -->
+<select id="getAttendanceByEmpIdAndDate" resultMap="attendanceMap">
+	select <include refid="attendanceProperty"/>
+	from t_attendance
+	where emp_id=#{empId} and month(att_date)=month(#{attDate})
+</select>
+
+<!-- 将csv文件数据导入到考勤数据表 -->
+<select id="csvInsert" parameterType="map">
+    load data infile #{src}
+	into table t_attendance character set gb2312
+	fields terminated by ',' optionally enclosed by '"' escaped by '"'
+	lines terminated by '\r\n'
+	(emp_id,work_day,leave_day,late_day,early_day,att_date,admin_id);
+</select>
+
+</mapper>

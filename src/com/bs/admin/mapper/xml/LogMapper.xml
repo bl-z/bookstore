@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.LogMapper">
+
+	<insert id="insertLog">
+		insert into t_log (
+		<include refid="logColumnInsert" />
+		)values (
+		<include refid="logValueInsert" />
+		);
+	</insert>
+	<delete id="deleteLogByTime">
+
+		delete from t_log where operate_type!=3 and log_time between '${startTime}' and
+		'${endTime}'
+
+	</delete>
+	
+	<select id="dynamicSelectLog" resultMap="logMap">
+		select
+		<include refid="logColumn" />
+		from t_log
+		<where>
+			<if test="log!=null ">
+
+				<if test="log.logId!=null">
+					and log_id=#{log.logId}
+				</if>
+
+				<if test="log.operateType!=null">
+					and operate_type=#{log.operateType}
+				</if>
+
+				<if test="log.operator!=null and log.operator.adminId!=null ">
+					and operator=#{log.operator.adminId}
+				</if>
+				<if test="log.operate!=null and log.operate!=''">
+					and operate like concat('%',#{log.operate},'%')
+				</if>
+				<if test="log.requestIp!=null and log.requestIp!=''">
+					and request_ip like concat('%',#{log.requestIp},'%')
+				</if>
+				<if test="log.dept!=null and log.dept!=''">
+					and dept like concat('%',#{log.dept},'%')
+				</if>
+				</if>
+			<if test="startTime=null and startTime!=''">
+				AND log_Time &gt;= '${startTime}'
+			</if>
+			<if test="endTime!=null and endTime!=''">
+				AND log_Time &lt;= '${endTime}'
+			</if>
+
+		</where>
+
+
+	</select>
+
+<resultMap type="Log" id="logMap" autoMapping="true">
+<association property="operator" javaType="Admin"
+			select="com.bs.admin.mapper.AdminMapper.getAdminByAdminId"
+			column="operator" />  
+</resultMap>
+
+
+
+	<sql id="logColumn">log_id,log_time,operate_type,operate,detail,request_ip,operator,dept
+	</sql>
+	<sql id="logValue">#{logId},#{logTime},#{operateType},#{operate},#{detail},#{requestIp},#{operator.adminId},#{dept}
+	</sql>
+	<sql id="logColumnInsert">operate_type,operate,detail,request_ip,operator,dept</sql>
+	<sql id="logValueInsert">#{operateType},#{operate},#{detail},#{requestIp},#{operator.adminId},#{dept}</sql>
+</mapper>

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:aop="http://www.springframework.org/schema/aop"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.3.xsd
+        http://www.springframework.org/schema/aop
+        http://www.springframework.org/schema/aop/spring-aop-4.3.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-4.3.xsd">
+
+	<!-- 选择并配置数据源，使用c3p0.ComboPooledDataSource会自动加载classpath下的c3p0.properties -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource"
+		destroy-method="close" />
+
+	<!-- 生成SessionFactory -->
+	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<!-- 扫描实体类 取别名 -->
+		<property name="typeAliasesPackage" value="com.bs.admin.pojo" />
+		<!-- 扫描XxxMapper.xml， mapperLocations：指明Mapper.xml文件路径 -->
+		<property name="mapperLocations"
+			value="classpath*:com/bs/admin/mapper/xml/*Mapper.xml" />
+		<!-- configuration：配置 -->
+		<property name="configuration">
+			<bean class="org.apache.ibatis.session.Configuration">
+				<!-- mapUnderscoreToCamelCase：将下划线映射到驼峰大小写 -->
+				<property name="mapUnderscoreToCamelCase" value="true" />
+				<!-- cacheEnabled：激活缓存 -->
+				<property name="cacheEnabled" value="true" />
+				<!--显示sql语句 -->
+			</bean>
+		</property>
+		<!-- 注意其他配置 -->
+		<property name="plugins">
+			<bean class="com.github.pagehelper.PageInterceptor">
+				<property name="properties">
+					<!--使用下面的方式配置参数，一行配置一个 -->
+					<value>
+						params=value1
+					</value>
+				</property>
+			</bean>
+		</property>
+	</bean>
+	
+
+	<!-- 注册接口文件 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="basePackage" value="com.bs.admin.mapper" />
+	</bean>
+
+	<!-- 事务控制 -->
+	<bean id="txManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 开启注解式事务 -->
+	<!-- <tx:annotation-driven/> -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<!-- read-only="true" : 告诉mybatis只需要创建一个只读的Connection -->
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="java.sql.SQLException" />
+			<tx:method name="delete*" propagation="REQUIRED"
+				rollback-for="java.sql.SQLException" />
+			<tx:method name="modify*" propagation="REQUIRED"
+				rollback-for="java.sql.SQLException" />
+			<tx:method name="get*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+
+
+	<!-- 配置aop切口 -->
+	<aop:config>
+		<aop:advisor advice-ref="txAdvice"
+			pointcut="execution(public * com.bs.admin.service..*.*(..))" />
+	</aop:config>
+
+</beans>

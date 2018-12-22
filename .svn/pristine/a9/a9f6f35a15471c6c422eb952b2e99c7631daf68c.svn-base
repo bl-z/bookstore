@@ -1,0 +1,32 @@
+package com.bs.admin.pojo;
+
+public class Permission {
+	private Long permissonId;
+	private String permissionName;
+	public Long getPermissonId() {
+		return permissonId;
+	}
+	public void setPermissonId(Long permissonId) {
+		this.permissonId = permissonId;
+	}
+	public String getPermissionName() {
+		return permissionName;
+	}
+	public void setPermissionName(String permissionName) {
+		this.permissionName = permissionName;
+	}
+	@Override
+	public String toString() {
+		return "Permission [permissonId=" + permissonId + ", permissionName=" + permissionName + "]";
+	}
+	public Permission() {
+		super();
+		// TODO Auto-generated constructor stub
+	}
+	public Permission(Long permissonId, String permissionName) {
+		super();
+		this.permissonId = permissonId;
+		this.permissionName = permissionName;
+	}
+	
+}

@@ -1,0 +1,189 @@
+package com.bs.admin.dao;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.bs.admin.pojo.Activity;
+import com.bs.admin.pojo.ActivityPageData;
+import com.bs.admin.pojo.Book;
+
+public interface ActivityDao {
+
+	/**
+	 * 获取所有的活动名
+	 * 
+	 * @return 所有活动的集合
+	 */
+	List<Activity> getActivityNameByActivity();
+
+	/**
+	 * 查询所有有活动的书
+	 * 
+	 * @return 活动的集合
+	 */
+	List<ActivityPageData> getAllActivityBook();
+
+	/**
+	 * 按页返回数据
+	 * 
+	 * @param start 查询的开始位置
+	 * @param end   查询的结束位置
+	 * 
+	 * @return 每页的数据
+	 */
+	List<ActivityPageData> getActivityPageData(Integer start, Integer end);
+
+	/**
+	 * 查询总条数
+	 * 
+	 * @return 总条数
+	 */
+	Integer getActivityPageDataTotal();
+
+	/**
+	 * 添加活动
+	 * 
+	 * @return Integer
+	 */
+	Integer insertActivity(Activity activity);
+
+	/**
+	 * 添加参与活动的书
+	 * 
+	 * @return Integer
+	 */
+	Integer addActiviryBook(Activity activity);
+
+	/**
+	 * 查询是否存在
+	 * 
+	 * @return Integer类型的数值
+	 */
+	Integer getIdCountByBookName(ActivityPageData activityPageData);
+
+	/**
+	 * 获取活动ID
+	 * 
+	 * @return 活动对象
+	 */
+	Activity getActivityIdByActivity(Activity activity);
+
+	/**
+	 * 添加中间表数据
+	 * 
+	 * @return Integer
+	 */
+	Integer insertActivityBook(Integer activityId, Integer bookId);
+
+	/**
+	 * 通过书名获取id
+	 * 
+	 * @return bookId
+	 */
+	Integer getBookIdByBookName(String bookName);
+
+	/**
+	 * 修改活动
+	 * 
+	 * @return Integer
+	 */
+	Integer updateActivityByActivityId(Activity activity);
+
+	/**
+	 * 删除活动---->将活动添加到取消活动---->删除中间表数据---->再从活动表删除
+	 * 
+	 * 删除活动—————>删除活动
+	 * 
+	 * @return Integer
+	 */
+	Integer deleteActivity(Integer activityId);
+
+	/**
+	 * 删除活动————>添加取消活动
+	 * 
+	 * @return Integer
+	 */
+	Integer addCancelActivity(ActivityPageData activityPageData);
+
+	/**
+	 * 删除活动—————>删除中间表数据
+	 * 
+	 * @return Integer
+	 */
+	Integer deleteActivityBook(Integer activityId, Integer bookId);
+
+	/**
+	 * 查询取消的活动的总数
+	 * 
+	 * @return 总数
+	 */
+	Integer getCancelTotal();
+
+	/**
+	 * 查询已取消的活动(全部返回)
+	 * 
+	 * @return Integer
+	 */
+	List<ActivityPageData> getCancelActivity(Integer start, Integer end);
+
+	/**
+	 * 优惠券查询
+	 * 
+	 * @return 按页返回的集合
+	 */
+	List<ActivityPageData> getAllActivity(Integer start, Integer end, String bookName, String activityName, String activityStart, String activityEnd);
+
+	/**
+	 * 查询总条数
+	 * 
+	 * @return 总条数
+	 */
+	Integer getTotal(String bookName, String activityName, String activityStart, String activityEnd);
+
+	/**  
+	
+	 * <p>Title: getAllBook</p>  
+	
+	 * <p>Description: 分页数据</p>  
+	
+	 * @param bookName
+	 * @param bookCategory
+	 * @param bookStatus
+	 * @param bottomPrice
+	 * @param topPrice
+	 * @param start
+	 * @param end
+	 * @return  
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	List<Book> getAllBook(String bookName, String bookCategory, String bookStatus, Double bottomPrice, Double topPrice, Integer start, Integer end);
+	
+	/**  
+	
+	 * <p>Title: getAllTotal</p>  
+	
+	 * <p>Description: 获取书的总条数</p>  
+	
+	 * @param bookName
+	 * @param bookCategory
+	 * @param bookStatus
+	 * @param bottomPrice
+	 * @param topPrice
+	 * @return  
+	 * <p> @date 2018年12月13日  </p> 
+	 */
+	Integer getAllTotal(String bookName, String bookCategory, String bookStatus, Double bottomPrice, Double topPrice);
+	
+	/**  
+	
+	 * <p>Title: getActivityIdTotal</p>  
+	
+	 * <p>Description: </p>  
+	
+	 * @param activityId
+	 * @return  个数
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	Integer getActivityIdTotal(Integer activityId);
+}

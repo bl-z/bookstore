@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.bs.admin.mapper.ThemeMapper">
+	
+	<!-- 更新主题 -->
+	<insert id="updateTheme">
+		update t_theme 
+		set theme_name = #{themeName}, recommend_reason = #{reason} 
+		where theme_id = #{themeId}
+	</insert>
+	
+ 
+ 	<!-- 添加主题书的信息 -->
+	<insert id="addThemeBook">
+		insert into t_book_theme
+		value(#{bookId}, #{themeId}, #{recommendWord})
+	</insert>
+  
+  
+  	<delete id="deleteBookTheme">
+  		delete from t_book_theme 
+  		where theme_id = #{themeId}
+  	</delete>
+  
+  
+  
+</mapper>
+
+

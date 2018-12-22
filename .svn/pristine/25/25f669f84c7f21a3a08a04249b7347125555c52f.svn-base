@@ -1,0 +1,103 @@
+package com.bs.admin.mapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.Book;
+import com.bs.admin.pojo.Purchase;
+import com.bs.admin.pojo.PurchaseItem;
+
+/**
+ * @author Administrator
+ * 
+ * 
+ *         查詢方法均報錯
+ *
+ */
+public class PurchaseItemTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static PurchaseItemMapper bean;
+	static {
+		bean = context.getBean(PurchaseItemMapper.class);
+	}
+	PurchaseItem purchaseItem = new PurchaseItem();
+	Purchase purchase = new Purchase();
+	Book book = new Book();
+	List<PurchaseItem> list = new ArrayList<PurchaseItem>();
+	@Test
+	public void Test() {
+
+	}
+
+	@Test
+	public void insertPurchaseItems() {
+		book.setBookId(100);
+		purchase.setPurchaseId(100);
+		purchaseItem = new PurchaseItem(purchase, book, 100, 66.66);
+		for(int i=0;i<3;i++){
+			list.add(purchaseItem);
+		}
+		bean.insertPurchaseItems(list);
+
+	}
+
+	@Test
+	public void selectByBook() {
+
+		List<PurchaseItem> selectByBookId = bean.selectByBookId(90);
+		System.out.println(selectByBookId.get(0));
+	}
+
+	// 报错
+	@Test
+	public void selectByPurchaseId() {
+	List<PurchaseItem> selectByPurchase = bean.selectByPurchaseId(90);
+		System.out.println(selectByPurchase.get(89));
+		List<PurchaseItem> selectByBookId = bean.selectByBookId(90);
+		System.out.println(selectByBookId.get(0));
+	}
+
+	// result Map 中purchase 查询失败 目前字段不全
+
+
+	@Test
+	public void deletPurchaseItemByIdBatch() {
+		ArrayList<Long> list = new ArrayList<Long>();
+		for (long i = 97L; i <= 118; i++) {
+
+			list.add(i);
+		}
+		bean.deletePurchaseItemByIdBatch(list);
+	}
+	@Test
+	public void deletPurchaseItemByPurchaseId() {
+		
+	bean.deletePurchaseItemByPurchaseId(23);
+	
+	}
+
+	@Test
+	public void insertPurchaseItem() {
+		book.setBookId(1);
+		purchase.setPurchaseId(2);
+		purchaseItem.setBook(book);
+		purchaseItem.setPurchaseItemId(20000L);
+		purchaseItem.setPurchase(purchase);
+		purchaseItem.setPurchasePrice(10.0);
+		purchaseItem.setPurchaseNum(1000);
+//		bean.insertPurchaseItem(purchaseItem);
+	}
+
+	@Test
+	public void updatePurchaseItem() {
+		purchaseItem.setPurchaseItemId(89L);
+		purchaseItem.setPurchasePrice(88.8);
+		Integer a = bean.updatePurchaseItem(purchaseItem);
+//		System.out.println(a);
+	}
+
+}

@@ -1,0 +1,89 @@
+package com.bs.admin.mapper;
+
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.Admin;
+import com.bs.admin.pojo.Salary;
+import com.bs.admin.service.AdminService;
+import com.bs.admin.service.AttendanceService;
+import com.bs.admin.service.SalaryService;
+
+
+public class AdminMapperTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	@Test
+	public void getAdmin(){
+		AdminMapper bean = context.getBean(AdminMapper.class);
+//		bean.getAdminByFields(adminId, adminAccount, empId, start, count);
+		List<Admin> list = bean.getAdminByFields(1L, null, null, 0, 10);
+		System.out.println("===================================");
+		System.out.println(list);
+	}
+	
+	@Test
+	public void count(){
+		AdminMapper bean = context.getBean(AdminMapper.class);
+		Integer count = bean.getAdminCount(null, "z", null);
+		System.out.println(count);
+	}
+	@Test
+	public void test(){
+		SalaryMapper sm = context.getBean(SalaryMapper.class);
+		EmployeeMapper em = context.getBean(EmployeeMapper.class);
+		AdminMapper am = context.getBean(AdminMapper.class);
+		SalaryService ss = context.getBean(SalaryService.class);
+		AttendanceService as = context.getBean(AttendanceService.class);
+		PermissionMapper pm = context.getBean(PermissionMapper.class);
+		AdminService as1 = context.getBean(AdminService.class);
+//		Salary salary = new Salary(15L, null, null, null, null);
+//		System.out.println(sm.getSalaryByEmpIdAndDate(1L, "2018-11-15"));
+		System.out.println(sm.getUnfinishedSalary().size());
+//		salary.setSalaryStatus(true);
+//		System.out.println(sm.updateSalaryStatus(salary));
+//		System.out.println(pm.getPermissionById(1L));
+	}
+	
+	@Test
+	public void tst() {
+//		int [][] array = {
+//				{2,3,4,5,6},
+//				{3,4,5,6,7},
+//				{4,5,6,7,8}
+//		};
+//		System.out.println(Find(11,array));
+		replaceSpace(new StringBuffer("a b c"));
+	}
+	 public static boolean Find(int target, int [][] array) {
+		 if(array.length == 0){
+	            System.out.println("空");
+	            return false;
+	        }
+		 System.out.println("不空");
+	        int len = array[0].length-1;
+	        for(int i = 0; i < array.length; i++){
+	            if(target > array[i][len]){
+	                continue;
+	            }
+	            for(int j = 0; j < len+1; j++){
+	                if(array[i][j] == target){
+	                    return true;
+	                }
+	            }
+	        }
+	        return false;
+	    }
+	 
+	 
+	 public static String replaceSpace(StringBuffer str) {
+		 int i = str.indexOf(" ");
+		 while(i>0){
+			 str.replace(i, i+1, "%20");
+		 }
+		 return str.toString();
+	}
+}

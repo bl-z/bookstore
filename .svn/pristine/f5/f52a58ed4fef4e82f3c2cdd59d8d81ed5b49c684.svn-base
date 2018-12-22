@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.bs.admin.mapper.OrderMapper">
+  
+	<!-- 多条件查询订单 -->
+	<select id="getOrderByOrderInfo" resultMap="orderResultMap">
+		select <include refid="orderColumns"/>, <include refid="addressColumns"/>,
+		<include refid="userColumns"/>, <include refid="expressColumns"/>
+		from t_order o, t_user u, t_express e, t_receive_address r
+		where o.user_id = u.user_id 
+		and o.express_id = e.express_id
+		and o.address_id = r.address_id 
+		<trim prefix="and" suffixOverrides="and">
+			<if test="null != orderId and '' != orderId">
+				order_id = #{orderId} and
+			</if>
+			<if test="null != orderStatus and '' != orderStatus">
+				order_status = #{orderStatus} and
+			</if>
+			<if test="null != topPrice and '' != topPrice and null != bottomPrice and '' != bottomPrice">
+				total_price &lt; #{topPrice} and total_price &gt; #{bottomPrice} and 
+			</if>
+		</trim>
+			limit #{start}, #{count}
+	</select>
+
+	<!-- 修改订单 -->
+	<update id="updateOrder">
+		update t_order o, t_receive_address r
+		<trim prefix="set" suffixOverrides=",">
+			<if test="null != orderStatus and '' != orderStatus">
+				o.order_status = #{orderStatus},
+			</if>
+			<if test="null != totalPrice  and '' != totalPrice">
+				o.total_price = #{totalPrice},
+			</if>	
+			<if test="null != consignee and '' != consignee">
+				r.address_consignee = #{consignee},
+			</if>
+			<if test="null != mobile and '' != mobile">
+				r.address_mobile = #{mobile},
+			</if>
+			<if test="null != province and '' != province">
+				r.address_province = #{province},
+			</if>
+			<if test="null != city and '' != city">
+				r.address_city = #{city},
+			</if>
+			<if test="null != county and '' != county">
+				r.address_county = #{county},
+			</if>
+			<if test="null != detail and '' != detail">
+				r.address_detail = #{detail},
+			</if>
+		</trim>
+		where o.address_id=r.address_id 
+		and o.order_id = #{orderId}
+	</update>
+	
+	<!-- 删除订单 -->
+	<delete id="deleteOrder">
+		delete from t_order where order_id = #{orderId}
+	</delete>
+	
+	<!-- 获取订单的全部状态 -->
+	<select id="getOrderStatus" resultMap="orderResultMap">
+		select order_status 
+		from t_order 
+		group by order_status
+	</select>
+	
+	<!-- 获取订单页面弹出的窗口显示的信息 -->
+	<select id="getOrderWinInfo" resultMap="orderResultMap1">
+		select b.book_name, b.book_sales_price, bo.book_num
+		from t_book_order bo, t_order o, t_book b
+		where bo.order_id = o.order_id 
+		and bo.book_id = b.book_id
+		and o.order_id = #{orderId}
+	</select>
+	
+	<resultMap type="order" id="orderResultMap1" autoMapping="true">
+		<id property="orderId" column="order_id"/>
+  		<collection property="books" ofType="book" autoMapping="true">
+  			<result property="bookName" column="book_name"/>
+  			<result property="bookSalesPrice" column="book_sales_price"/>
+  		</collection>
+	</resultMap>
+	
+	<!-- 映射 -->
+  <resultMap type="order" id="orderResultMap" autoMapping="true">
+  		<id property="orderId" column="order_id"/>
+  		<association property="user" javaType="user" autoMapping="true">
+  			<!-- <id property="userId" column="user_id"/>
+  			<id property="userName" column="user_name"/> -->
+  		</association>
+  		<association property="express" javaType="express" autoMapping="true"/>
+  		<association property="receiveAddress" javaType="receiveAddress" autoMapping="true"/>
+  </resultMap>
+
+  <!-- 订单表的字段 -->
+  <sql id="orderColumns">
+	  	o.order_id, o.express_id, o.address_id, o.user_id, o.order_time, o.order_status, o.total_price
+  </sql>
+  
+  <!-- 地址表的字段 -->
+  <sql id="addressColumns">
+  		r.address_mobile, r.address_consignee, r.address_province, r.address_city, r.address_county, r.address_detail, r.address_status
+  </sql>
+  
+  <!-- 用户表的字段 -->
+  <sql id="userColumns">
+  		u.user_id, u.user_name
+  </sql>
+  
+  <!-- 快递表的字段 -->
+  <sql id="expressColumns">
+  		e.express_id, e.express_name, e.express_numbers, e.express_cost, e.express_status
+  </sql>
+  
+</mapper>

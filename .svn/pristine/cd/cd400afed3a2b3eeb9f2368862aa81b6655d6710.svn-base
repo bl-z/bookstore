@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.ActivityPageDataMapper">
+	<!-- 按页返回数据集合 -->
+	<select id="getActivityPageData"
+		resultMap="activityPageDataResultMap">
+		SELECT
+		a.activity_id,c.book_name,a.activity_name,a.activity_discount,a.activity_start,a.activity_end
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id and b.book_id = c.book_id
+		LIMIT #{start},#{end}
+	</select>
+	<!-- 查询数据的条数 -->
+	<select id="getActivityPageDataTotal" resultType="java.lang.Integer">
+		SELECT count(*) from t_activity a,t_activity_books b,t_book
+		c
+		where a.activity_id = b.activity_id
+		and b.book_id = c.book_id
+	</select>
+	<!-- 查询是否存在 -->
+	<select id="getIdCountByBookName" resultType="java.lang.Integer">
+		SELECT
+		count(a.activity_id) from t_activity a,t_activity_books b,t_book c
+		where a.activity_id = b.activity_id
+		and b.book_id = c.book_id
+		and c.book_name = #{bookName}
+		and a.activity_name
+		= #{activityName}
+		and activity_discount = #{activityDiscount}
+		and
+		a.activity_start =#{activityStart}
+		and a.activity_end = #{activityEnd}
+	</select>
+	<!-- 添加取消的活动 -->
+	<insert id="insertCancelActivity">
+		insert into t_cancel_activity
+		(activity_name,book_name,activity_discount,activity_start,activity_end)
+		values
+		(#{activityName},#{bookName},#{activityDiscount},#{activityStart},#{activityEnd})
+	</insert>
+	<!-- 查询已取消的活动 -->
+	<select id="getCancelActivity" resultMap="activityPageDataResultMap">
+		SELECT
+		activity_id,book_name,activity_name,activity_discount,activity_start,activity_end
+		from t_cancel_activity
+		LIMIT #{start},#{end}
+	</select>
+	<!-- 查询取消的活动的总数 -->
+	<select id="getCancelTotal" resultType="java.lang.Integer">
+		select count(*) from
+		t_cancel_activity
+	</select>
+	<!-- 删除取消的活动 -->
+	<delete id="delCancelActivity">
+		delete from t_cancel_activity
+		where activity_id =
+		#{activityId}
+	</delete>
+	<!-- 查询所有活动 -->
+	<select id="getAllActivity" resultMap="activityPageDataResultMap">
+		SELECT
+		a.activity_id,c.book_name,a.activity_name,a.activity_discount,a.activity_start,a.activity_end
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id
+		and b.book_id = c.book_id
+		<if test="bookName!=null and bookName!='' ">
+			and c.book_name = #{bookName}
+		</if>
+		<if test="activityName!=null and activityName!='' ">
+			and a.activity_name = #{activityName}
+		</if>
+		<if
+			test="null!=activityStart and activityStart!='' and null!= activityEnd and activityEnd!=''">
+			and a.activity_start between #{activityStart} and #{activityEnd}
+			and a.activity_end between #{activityStart} and #{activityEnd}
+		</if>
+		<if test="null!=start and null!= end">
+			LIMIT #{start},#{end}
+		</if>
+	</select>
+	<!-- 查询总数 -->
+	<select id="getTotal" resultType="java.lang.Integer">
+		SELECT
+		count(*)
+		from t_activity a,t_activity_books b,t_book c
+		where a.activity_id =
+		b.activity_id
+		and b.book_id = c.book_id
+		<if test="bookName!=null and bookName!='' ">
+			and c.book_name = #{bookName}
+		</if>
+		<if test="activityName!=null and activityName!='' ">
+			and a.activity_name = #{activityName}
+		</if>
+		<if
+			test="null!=activityStart and activityStart!='' and null!= activityEnd and activityEnd!=''">
+			and a.activity_start between #{activityStart} and #{activityEnd}
+			and a.activity_end between #{activityStart} and #{activityEnd}
+		</if>
+	</select>
+	<!-- 查询中间表中id的个数 -->
+	<select id="getActivityIdTotal" resultType="java.lang.Integer">
+		select count(activity_id) from
+		t_activity_books
+		where activity_id =#{activityId};
+	</select>
+
+	<resultMap type="activityPageData"
+		id="activityPageDataResultMap" autoMapping="true">
+	</resultMap>
+	<sql id="activityPageDataColumns">activity_id,book_name,activity_name,activity_discount,activity_start,activity_end
+	</sql>
+	<sql id="activityPageDataValues">#{activityId},#{bookName},#{activityName},#{activityDiscount},#{activityStart},#{activityEnd}
+	</sql>
+</mapper>

@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.StoreHouseMapper">
+
+<select id="selectById" resultMap="StoreHouseMap">
+
+
+select store_house_id ,store_house_name,store_house_address from t_store_house where store_house_id=#{storeHouseId}
+
+</select>
+<resultMap type="StoreHouse" id="StoreHouseMap" autoMapping="true">
+
+</resultMap>
+</mapper>

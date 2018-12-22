@@ -1,0 +1,73 @@
+package com.bs.admin.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.bs.admin.pojo.Activity;
+
+public interface ActivityMapper {
+	/**
+	 * 查询所有活动名
+	 * 
+	 * @return 所有活动的集合
+	 */
+	List<Activity> getActivityNameByActivity();
+
+	/**
+	 * 查询所有有活动的书
+	 * 
+	 * @return 活动的集合
+	 */
+	List<Activity> getAllActivityBook();// 此方法未使用
+
+	/**
+	 * 添加活动
+	 * 
+	 * @return Integer
+	 */
+	Integer insertActivity(Activity activity);
+
+	/**
+	 * 添加参与活动的书
+	 * 
+	 * @return Integer
+	 */
+	Integer addActiviryBook(Activity activity);
+
+	/**
+	 * 获取活动ID
+	 * 
+	 * @return 活动对象
+	 */
+	Activity getActivityIdByActivity(Activity activity);
+
+	/**
+	 * 添加中间表数据
+	 * 
+	 * @return Integer
+	 */
+	Integer insertActivityBook(@Param("activityId") Integer activityId, @Param("bookId") Integer bookId);
+
+	/**
+	 * 修改活动
+	 * 
+	 * @return Integer
+	 */
+	Integer updateActivityByActivityId(Activity activity);
+
+	/**
+	 * 删除活动---->将活动添加到取消活动---->删除中间表数据---->再从活动表删除
+	 * 
+	 * @return Integer
+	 */
+	Integer deleteActivity(@Param("activityId") Integer activityId);
+	
+	/**
+	 * 删除中间表数据
+	 * 
+	 * @return Integer
+	 */
+	Integer deleteActivityBook(@Param("activityId") Integer activityId, @Param("bookId") Integer bookId);
+
+}

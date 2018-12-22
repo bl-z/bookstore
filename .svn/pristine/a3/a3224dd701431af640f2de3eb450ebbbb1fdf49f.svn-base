@@ -1,0 +1,171 @@
+package com.bs.admin.mapper;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.dao.PurchaseDao;
+import com.bs.admin.pojo.Employee;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.Purchase;
+import com.bs.admin.pojo.Supplier;
+import com.bs.admin.service.FinancialService;
+import com.bs.admin.service.PurchaseService;
+
+public class PurchaseTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static PurchaseMapper bean;
+	private static PurchaseService ps=context.getBean(PurchaseService.class);
+	private static PurchaseDao pd=context.getBean(PurchaseDao.class);
+	private static FinancialService fs=context.getBean(FinancialService.class);
+	
+	static {
+		bean = context.getBean(PurchaseMapper.class);
+	}
+
+	Purchase purchase = new Purchase();
+	Employee employee = new Employee();
+	Supplier supplier = new Supplier();
+	private Employee empByEmpId;
+
+	@Test
+	public void insertPurchase() {
+		employee.setEmpId(1L);
+		supplier.setSupplierId(2);
+		purchase.setEmployee(employee);
+		purchase.setSupplier(supplier);
+		purchase.setPurchaseBatch("2018年12月");
+		purchase.setPurchaseDate("2018-12-1");
+		purchase.setPurchaseLog("测试方法");
+		purchase.setPurchaseStatus(1);
+		bean.insertPurchase(purchase);
+
+	}
+
+	@Test
+	public void deletePurchaseById() {
+		bean.deletePurchaseById(1);
+
+	}
+	@Test
+	public void updatePurchaseStatusToStock() {
+		bean.updatePurchaseStatusToStock(1026);
+		
+	}
+	@Test
+	public void selectPurchaseBuget() {
+		List<Purchase> list = bean.selectPurchaseBuget();
+		System.out.println(list.get(0));
+		System.out.println(list.get(1));
+		System.out.println(list.get(2));
+		
+	}
+	@Test
+	public void selectPurchaseBugetdao() {
+		List<Purchase> list = pd.selectPurchaseBuget();
+		System.out.println(list.get(0));
+		System.out.println(list.get(1));
+		System.out.println(list.get(2));
+		
+	}
+	@Test
+	public void selectPurchaseBugetao() {
+		 PageData<Purchase> purchaseData = fs.getPurchaseData(1, 10);
+	System.out.println(purchaseData.getTotal());;
+	System.out.println(purchaseData.getRows().get(0));;
+		
+	}
+	@Test
+	public void updatePurchaseStatusToStockBatch() {
+		List<Integer> list = new ArrayList<Integer>();
+		list.add(1023);
+		list.add(1024);
+		Integer row = bean.updatePurchaseStatusToStockBatch(list);
+		System.out.println(row);
+	}
+
+	@Test
+	public void updatePurchase() {
+		employee.setEmpId(1L);
+		supplier.setSupplierId(2);
+		purchase.setEmployee(employee);
+		purchase.setSupplier(supplier);
+		purchase.setPurchaseBatch("2018年12月");
+		purchase.setPurchaseDate("2015-12-1");
+		purchase.setPurchaseLog("hahahah");
+		purchase.setPurchaseStatus(1);
+		purchase.setPurchaseId(1023);
+		bean.updatePurchase(purchase);
+
+	}
+
+	@Test
+	public void selectPurchaseBatch() {
+		int size = bean.selectPurchaseBatch().size();
+		System.out.println(size);
+	}
+	@Test
+	public void autoCheckPurchaseStatus() {
+	 List<Integer> list = bean.selectPurchaseStatus3();
+		System.out.println(list.size());
+		Integer rows = bean.updatePurchaseStatusToStockBatch(list);
+		System.out.println(rows);
+	}
+	@Test
+	public void selectPurchaseById() {
+		 Purchase purchase = bean.selectPurchaseById(2);
+		System.out.println(purchase);
+	}
+
+	@Test
+	public void getEmpByEmpId() {
+		EmployeeMapper bean=	context.getBean(EmployeeMapper.class);
+		Employee employee = bean.getEmpByEmpId(1L);
+
+	}
+
+	/**  
+	
+	 * <p>Title: dynamicSelect</p>  
+	
+	 * <p>Description: 出现bug  百度的employee子查询查不到 </p>  
+	  
+	 * <p> @date 2018年11月30日  </p> 
+	 */
+	@Test
+	public void dynamicSelect() {
+		employee.setEmpId(1L);
+		supplier.setSupplierId(4);
+		
+		purchase.setEmployee(employee);
+//		purchase.setPurchaseStatus(1);
+		purchase.setSupplier(supplier);
+		/*
+		 * purchase.setPurchaseBatch("2018年12月");
+		 * purchase.setPurchaseDate("2015-12-1");
+		 * purchase.setPurchaseLog("hahahah"); purchase.setPurchaseStatus(1);
+		 */
+		System.out.println("purch : /**");
+		
+		System.out.println("purch : "+purchase);
+		
+		System.out.println("sp : "+supplier);
+
+		List<Purchase> dynamicSelect = bean.dynamicSelect(purchase, null, null);
+		
+		System.out.println(dynamicSelect.get(0));
+		
+		System.out.println(dynamicSelect.size());
+
+		
+	}
+	@Test 
+	public void selectPay(){
+		Double purchasePay = ps.getPurchasePay(90);
+		System.out.println(purchasePay);
+	}
+
+}

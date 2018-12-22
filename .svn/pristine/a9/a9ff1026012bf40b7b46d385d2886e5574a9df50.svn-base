@@ -1,0 +1,128 @@
+var url = "";// 定义一个全局变量传给id为fm的form提交事件
+var $_index;
+var $row;
+var $form = {};
+
+$(function(){
+	// 单击事件
+	$("#dg").datagrid({onSelect:function(index, row){
+			$_index = index;
+			$row = row;
+		}
+	});
+	
+
+	/*$("#dg").datagrid({onDblClickRow : function(index, row) {
+			//alert(row.username + "  :   " + row.orderId);
+			$("#winInfo").window("open");
+			$.ajax({
+				url : '/bookstore/orderController/getOrderWinInfo',
+				dataType : 'json',
+				async : false,
+				data : {
+					orderId : $row.orderId;
+				},
+				success : function(data){
+					console.log(data);
+					$("#orderInfo").datagrid("loadData", data);
+				}
+			});
+		}
+	});*/
+	
+
+		$("#dg").datagrid({onDblClickRow : function(index, row) {
+			$('#winInfo').window('open');
+
+			$.ajax({
+				url : '/bookstore/orderController/getOrderWinInfo',
+				dataType : "json",
+				async : false,
+				data : {
+					orderId : row.orderId,
+				},
+				success : function(data) {
+					console.log(data);
+					$("#orderInfo").datagrid('loadData', data);
+				}
+			});
+		}
+	});
+	
+});
+
+function editOrder() {
+	$("input[name=orderId]").attr("readonly", "readonly");
+	// datagrid的getSelected方法是返回数据网格的第一个选中的行或者 null。
+	var row = $('#dg').datagrid('getSelected');
+	if (row) {
+		$('#dlg').dialog('open').dialog('setTitle', '修改订单信息。注意：订单号不可修改！！');
+		$('#fm').form('load', row);
+		url = 'updateOrder';
+	}
+}
+
+// id为fm的form的提交事件，由用户信息编辑对话框的确定按钮点击触发
+function saveOrder() {
+	// easyui对ajax的封装
+	$('#fm').form('submit', {
+		url : url,
+		onSubmit : function() {
+	            var temp = $('#fm').serializeArray();
+	            $.each(temp, function (i, item) {
+	            	$form[item.name] = item.value;
+	            });
+			// 进行表单字段验证，当全部字段都有效时返回 true 。该方法和 validatebox 插件一起使用。
+			return $('#fm').form('validate');// jquery $("#")  $('#fm').form('validate') 会去调用验证框架进行验证，然后对所有easyui-validateBox验证结果进行与操作，全部ok表单才可以提交
+		},
+		success : function(result) {
+			var result = eval('(' + result + ')');// 数据解析，如果是json数据就解析成json
+			if (result.state) {
+				if(url == 'editOrder'){
+					$('#dg').datagrid('updateRow', {
+						index : $_index,
+						row : $form
+					});
+				}
+				
+				$('#dlg').dialog('close'); // 关闭窗口
+				
+			}
+			
+			$.messager.show({
+				title : '提示信息！',
+				msg : result.msg
+			});
+		}
+	});
+}
+
+// 删除书的方法
+function removeOrder() {
+	var row = $('#dg').datagrid('getSelected');
+	if (row) {
+		$.messager.confirm('Confirm','Are you sure you want to remove this order?', 
+			function(cfm) {
+				if (cfm) {
+					// $.post(url,data,success(data, textStatus,xhr),dataType)
+					$.post('removeOrder', {orderId : row.orderId},
+					function(result) {
+						if (result.state) {
+							$.messager.show({ // show success message
+								title : 'Success',
+								msg : result.msg
+							});
+							$("#dg").datagrid('deleteRow', $_index);
+						} else {
+							$.messager.show({ // show error message
+								title : 'Error',
+								msg : result.msg
+							});
+						}
+					}, 'json'// 返回的数据类型
+					);
+				}
+			}
+		);
+	}
+}

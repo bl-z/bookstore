@@ -1,0 +1,131 @@
+package com.bs.admin.service;
+
+import java.util.List;
+
+import com.bs.admin.pojo.Financial;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.QueryBoxData;
+
+public interface FinancialService {
+
+	/**
+	 * 获取财务收入、支出
+	 * 
+	 * @return 集合
+	 */
+	List<QueryBoxData> getAllStastus();
+
+	/**
+	 * 获取财务类型
+	 * 
+	 * @return 类型集合
+	 */
+	List<QueryBoxData> getAllTypes();
+
+	/**
+	 * 获取财务方式
+	 * 
+	 * @return 方式集合
+	 */
+	List<QueryBoxData> getAllWays();
+
+	/**
+	 * 支出信息添加
+	 * 
+	 * @return JsonData
+	 */
+	Integer addFinancial(Financial financial);
+
+	/**
+	 * 支出信息删除
+	 * 
+	 * @return JsonData
+	 */
+	Integer delFinancial(Financial financial);
+
+	/**
+	 * 支出信息修改
+	 * 
+	 * @return
+	 */
+	Integer updateFinancial(Financial financial);
+
+	/**
+	 * 页面数据集合
+	 * 
+	 * @return PageData集合
+	 */
+	PageData<Financial> getAllFinancial(Integer pageNum, Integer pageSize, String financialStatus, String financialTypes, String financialStart, String financialEnd);
+
+	/**
+	 * 自动添加工资支出
+	 * 
+	 * @param salary     工资金额
+	 * @param empAccount 员工账户
+	 * @param empName 员工名字+发工资月
+	 * @return Integer
+	 */
+	Integer addSalaryExpend(Double salary, String empAccount , String empName, String salaryDate);
+	
+	/**  
+	 * <p>Title: delSalaryExpend</p>  
+	 * <p>Description: 自动删除工资支出信息</p>  
+	  * @param salary     工资金额
+	 * @param empAccount 员工账户
+	 * @param empName 员工名字+发工资月
+	 * @return  
+	 * <p> @date 2018年12月19日  </p> 
+	 */
+	Integer delSalaryExpend(Double salary, String empAccount , String empName, String salaryDate);
+
+	/**
+	 * 自动添加采购支出
+	 * 
+	 * @param purchaseMoney   采购金额
+	 * @param purchaseAccount 对方账户
+	 * @param payWays 支付方式
+	 * @param purchserName 采购人名
+	 * @param purchaseId 采购编号
+	 * @return Integer
+	 */
+	Integer addPurchaseExpend(Double purchaseMoney, String purchaseAccount ,String payWays, String purchserName, String purchaseId);
+
+	/**  
+	 * <p>Title: delPurchaseExpend</p>  
+	 * <p>Description: 自动删除采购支出信息</p>  
+	 * @param purchaseMoney   采购金额
+	 * @param purchaseAccount 对方账户
+	 * @param payWays 支付方式
+	 * @param purchserName 采购人名
+	 * @param purchaseId 采购编号
+	 * @return  
+	 * <p> @date 2018年12月19日  </p> 
+	 */
+	Integer delPurchaseExpend(Double purchaseMoney, String purchaseAccount ,String payWays, String purchserName, String purchaseId);
+	
+	/**
+	 * 自动添加订单收入
+	 * 
+	 * @param orderMoney  订单金额
+	 * @param userAccount 用户账户
+	 * @param payWays 支付方式
+	 * @param userid 用户id
+	 * @param bookNmae 购买书书名
+	 * @return Integer
+	 */
+	Integer addOrderReveNue(Double orderMoney, String userAccount, String payWays, String userid, String bookNmae);
+	
+	/**  
+	 * <p>Title: delOrderReveNue</p>  
+	 * <p>Description: 自动删除订单收入信息</p>  
+	 * @param orderMoney  订单金额
+	 * @param userAccount 用户账户
+	 * @param payWays 支付方式
+	 * @param userid 用户id
+	 * @param bookNmae 购买书书名
+	 * @return  
+	 * <p> @date 2018年12月19日  </p> 
+	 */
+	Integer delOrderReveNue(Double orderMoney, String userAccount, String payWays, String userid, String bookNmae);
+
+}

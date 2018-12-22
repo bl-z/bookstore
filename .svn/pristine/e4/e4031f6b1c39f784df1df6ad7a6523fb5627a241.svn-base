@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.bs.admin.mapper.PrintInfoMapper">
+
+	<!-- 通过印刷id查询印刷信息 -->
+	<select id="getPrintInfoByPrintId" parameterType="Integer" resultMap="printInfoResultMap">
+		select  <include refid="printInfoColumns"/>
+		from t_print_info where print_id = #{printId}
+	</select>
+	
+	<!-- 删除印刷信息 -->
+	<delete id="deletePrintInfo">
+		delete from t_print_info where print_id = #{printId}
+	</delete>
+	
+	
+	<!-- <insert id="createPrintInfo">
+		insert into t_print_info
+		value(
+			<trim suffixOverrides=",">
+				<if test="null != printId">
+					#{printId},
+				</if>
+				<if test="null != printSize">
+					#{printSize},
+				</if>
+				<if test="null != printDate">
+					#{printDate},
+				</if>
+				<if test="null != printQuantity">
+					#{printQuantity},
+				</if>
+				<if test="null != printBatch">
+					#{printBatch}
+				</if>
+			</trim>
+		)
+	</insert> -->
+	
+	<!-- 自动映射 -->
+  <resultMap type="printInfo" id="printInfoResultMap" autoMapping="true"/>
+  
+  <!-- 印刷信息表字段 -->
+  <sql id="printInfoColumns">
+  		print_id, print_size, print_date, print_quantity, print_batch
+  </sql>
+  
+  
+  
+  
+</mapper>

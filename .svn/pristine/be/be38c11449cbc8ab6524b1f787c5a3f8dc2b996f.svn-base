@@ -1,0 +1,107 @@
+package com.bs.admin.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.bs.admin.pojo.ActivityPageData;
+
+/**
+ * 
+ * Title: ActivityPageDataMapper
+ * 
+ * @Description:活动页数据集
+ * 
+ * @author 赵宝林
+ * 
+ * @date 2018年11月29日
+ * 
+ */
+public interface ActivityPageDataMapper {
+
+	/**
+	 * 查询所有书的活动数据
+	 * 
+	 * @return 每页的数据
+	 */
+	List<ActivityPageData> getActivityPageData(@Param("start") Integer start, @Param("end") Integer end);
+
+	/**
+	 * 查询所有的条数
+	 * 
+	 * @return 总条数
+	 */
+	Integer getActivityPageDataTotal();
+
+	/**
+	 * 查询满足条件的id的个数
+	 * 
+	 * @return Integer类型的数值
+	 */
+	Integer getIdCountByBookName(ActivityPageData activityPageData);
+
+	/**
+	 * 删除活动————>添加取消活动
+	 * 
+	 * @return Integer
+	 */
+	Integer insertCancelActivity(ActivityPageData activityPageData);
+	
+	/**
+	 * 查询取消的活动的总数
+	 * 
+	 * @return 总数
+	 */
+	Integer getCancelTotal();
+
+	/**
+	 * 查询已取消的活动(按页返回)
+	 * 
+	 * @return 每页的数据
+	 */
+	List<ActivityPageData> getCancelActivity(@Param("start") Integer start,@Param("end") Integer end);
+
+	/**
+	 * 删除取消的活动(通过id删除)
+	 * 
+	 * @return Integer
+	 */
+	Integer delCancelActivity(@Param("activityId") Integer activityId);
+	
+	/**
+	 * 优惠券查询
+	 * 
+	 * @return 按页返回的集合
+	 */
+	List<ActivityPageData> getAllActivity(
+			@Param("start") Integer start,
+			@Param("end") Integer end, 
+			@Param("bookName") String bookName, 
+			@Param("activityName") String activityName, 
+			@Param("activityStart") String activityStart, 
+			@Param("activityEnd") String activityEnd);
+
+	/**
+	 * 查询总条数
+	 * 
+	 * @return 总条数
+	 */
+	Integer getTotal(
+			@Param("bookName") String bookName, 
+			@Param("activityName") String activityName, 
+			@Param("activityStart") String activityStart, 
+			@Param("activityEnd") String activityEnd);
+	
+	/**  
+	
+	 * <p>Title: getActivityIdTotal</p>  
+	
+	 * <p>Description: 查询活动的id的个数</p>  
+	
+	 * @param activityId
+	 * @return  个数
+	 * <p> @date 2018年12月14日  </p> 
+	 */
+	Integer getActivityIdTotal(@Param("activityId") Integer activityId);
+
+}

@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+	<mapper namespace="com.bs.admin.mapper.AuthorMapper">
+	
+	<!-- parameterType：传进来的参数类型 -->
+	<!-- 通过作者姓名查询该作者写的书。作者和书，多对多查询 -->
+	<select id="getAuthorByAuthorInfo" parameterType="author" resultMap="authorResultMap">
+		select  <include refid="authorColumns"/>, <include refid="bookColumns"/>
+		from t_book b, t_author a, t_book_author ba 
+		where b.book_id = ba.book_id 
+		and a.author_id = ba.author_id 
+		<trim prefix="and" suffixOverrides="and">
+			<if test="null != authorId">
+				a.author_id = #{authorId} and 
+			</if>
+			<if test="null != authorName">
+				a.author_name like concat('%', #{authorName}, '%') and 
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 获取全部作者 -->
+	<select id="getAllAuthor" resultMap="authorResultMap">
+		select author_id, author_name from t_author
+		<trim prefix="where" suffixOverrides="and">
+			<if test="null != authorId">
+				author_id = #{authorId} and 
+			</if>
+			<if test="null != authorName">
+				author_name like concat('%', #{authorName}, '%')
+			</if>
+		</trim>
+	</select>
+	
+	<!-- 修改作者 -->
+  <update id="updateAuthor">
+  		update t_author set author_name = #{authorName} where author_id=#{authorId}
+  </update>
+ 
+ 	<!-- 添加作者 -->
+	<insert id="createAuthor">
+		insert into t_author
+		value(#{authorId}, #{authorName})
+	</insert>
+	
+	<!-- 中间表添加信息 -->
+	<insert id="createBookAuthor">
+		insert into t_book_author 
+		value(#{bookId}, #{authorId})
+	</insert>
+	
+	<!-- 中间表修改信息 -->
+	<update id="updateBookAuthor">
+		update t_book_author set book_id=#{bookId} 
+		where author_id=#{authorId}
+	</update>
+	
+	<!-- 作者字段的映射 -->
+  <resultMap type="author" id="authorResultMap" autoMapping="true">
+  		<id property="authorId" column="author_id"/>
+  		<!-- collection多对多查询 -->
+  		<collection property="books" ofType="book" autoMapping="true"/>
+  </resultMap>
+  
+  <!-- 作者表的字段 -->
+  <sql id="authorColumns">
+  		a.author_id, a.author_name
+  </sql>
+ 
+ 	<!-- 书的表的字段 -->
+   <sql id="bookColumns">
+  		b.primary_id, b.book_id, b.book_name, b.book_category, b.book_sales_price, b.book_profile,b.book_cover_image,
+  		b.book_status,b.publish_name, b.print_id
+  </sql>
+  
+</mapper>
+
+

@@ -1,0 +1,77 @@
+package com.bs.admin.service;
+
+import java.util.List;
+
+import org.springframework.stereotype.Service;
+
+import com.bs.admin.pojo.CategoryOrStatus;
+import com.bs.admin.pojo.OrderModel;
+import com.bs.admin.pojo.WindowInfo;
+
+@Service
+public interface OrderService {
+
+	/**
+	 * 
+	 * <p>Title: queryOrder</p>  
+	 * <p>Description: 查询订单</p>  
+	 * @param orderId
+	 * @param orderStatus
+	 * @param topPrice
+	 * @param bottomPrice
+	 * @param pageNumber
+	 * @param pageSize
+	 * @return  
+	 * <p> @date 2018年12月10日  </p>
+	 */
+	List<OrderModel> queryOrder(String orderId, String orderStatus, Double topPrice, Double bottomPrice,
+			Integer pageNumber, Integer pageSize);
+
+	/**
+	 * 
+	 * <p>Title: daleteOrder</p>  
+	 * <p>Description: 删除订单</p>  
+	 * @param orderId
+	 * @return  
+	 * <p> @date 2018年12月10日  </p>
+	 */
+	Integer daleteOrder(String orderId);
+
+	/**
+	 * 
+	 * <p>Title: updateOrder</p>  
+	 * <p>Description: 修改订单</p>  
+	 * @param orderId
+	 * @param orderStatus
+	 * @param totalPrice
+	 * @param consignee
+	 * @param mobile
+	 * @param province
+	 * @param city
+	 * @param county
+	 * @param detail
+	 * @return  
+	 * <p> @date 2018年12月10日  </p>
+	 */
+	Integer updateOrder(String orderId, String orderStatus, Double totalPrice, String consignee, String mobile,
+			String province, String city, String county, String detail);
+
+	/**
+	 * 
+	 * <p>Title: getOrderStatus</p>  
+	 * <p>Description: 获取订单类型</p>  
+	 * @return  
+	 * <p> @date 2018年12月10日  </p>
+	 */
+	List<CategoryOrStatus> getOrderStatus();
+	
+	/**
+	 * 
+	 * <p>Title: getOrderWinInfo</p>  
+	 * <p>Description: </p>  
+	 * @param orderId
+	 * @return  
+	 * <p> @date 2018年12月11日  </p>
+	 */
+	List<WindowInfo> getOrderWinInfo(String orderId);
+}

@@ -1,0 +1,102 @@
+.easyui-numberbox {
+	width: 75px;
+}
+
+#fm {
+	margin: 0;
+	padding: 10px 30px;
+}
+
+.ftitle {
+	font-size: 14px;
+	font-weight: bold;
+	color: #666;
+	padding: 5px 0;
+	margin-bottom: 10px;
+	border-bottom: 1px solid #ccc;
+}
+
+.fitem {
+	margin-bottom: 5px;
+}
+
+.easyui-datagrid {
+	width: 90%;
+}
+
+.fitem label {
+	display: inline-block;
+	width: 80px;
+}
+
+#pro {
+	border-collapse: collapse;
+	margin: 0 auto;
+	text-align: center;
+}
+
+#pro td, #pro th {
+	border: 1px solid #cad9ea;
+	color: #666;
+	height: 30px;
+}
+
+#pro thead th {
+	background-color: #CCE8EB;
+	width: 100px;
+}
+
+#pro tr:nth-child(odd) {
+	background: #fff;
+}
+
+#pro tr:nth-child(even) {
+	background: #F5FAFA;
+}
+
+
+#tips{
+position:relative;
+bottom:332px;
+left:230px;
+} 
+
+
+#profile {
+	color: rgba(288, 0, 0, 0.6);
+	alien: center;
+}
+
+li {
+	font-weight: bold;
+	list-style: none;
+	margin-top: 10px;
+}
+
+li span {
+	font-weight: normal;
+	color: black;
+}
+
+#top1 {
+	width:30%;
+	hight: 10px;
+	float: left;
+	margin-left: 150px;
+		alien:center;
+}
+
+#top2 {
+	width:30%;
+	hight: 10px;
+	float: left;
+	margin-left: 100px;
+		alien:center;
+}
+
+#bottom1 {
+	width: 100%;
+	text-align: center;
+	float: left;
+	margin-bottom: 50px;
+}

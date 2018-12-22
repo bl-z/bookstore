@@ -1,0 +1,171 @@
+package com.bs.admin.mapper;
+
+
+
+
+import java.util.ArrayList;
+import java.util.List;
+
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.PIPojo;
+import com.bs.admin.pojo.Stock;
+import com.bs.admin.pojo.StockPojo;
+import com.bs.admin.pojo.Supplier;
+import com.github.pagehelper.PageHelper;
+
+public class StockTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static StockMapper sm=context.getBean( StockMapper.class);
+	private static StockPoJoMapper spm=context.getBean( StockPoJoMapper.class);
+	Supplier supplier = new Supplier();
+
+	@Test
+	public void insertStockBatch() {
+	
+		List<PIPojo> pi = new  ArrayList<PIPojo>();
+		pi.add(new PIPojo(139L, null, 139, 455, null));
+		pi.add(new PIPojo(140L, null, 140, 9559, null));
+	/*	pi.add(new PIPojo(6L, null, 8, 369, null));
+		pi.add(new PIPojo(4L, null, 9, 34525, null));*/
+		List<StockPojo> sl = new ArrayList<StockPojo>();
+		
+		int size = pi.size();
+		
+		for(int i=0;i<size;i++){
+			PIPojo p = pi.get(i);
+			sl.add(new StockPojo(p.getBookId(), p.getPurchaseItemId(), p.getPurchaseNum(), 3));
+		}
+		spm.insertStockBatch(sl);
+		
+		
+	}
+	
+	@Test
+	public void updateService() {
+		updateBatch();
+	}
+	
+	
+	@Test
+	public void selectVStock() {
+		List<Stock> selectVStock = sm.selectVStock(null);
+		System.out.println(selectVStock.get(0));
+	}
+	
+	
+	@Test
+	public void selectBookStockForSale() {
+
+		List<StockPojo> list = spm.selectBookStockForSale(3);
+	
+		
+	}
+	
+	@Test
+	public void selectBookStockNum() {
+		
+		Integer num = sm.selectBookStockNum(3);
+		System.out.println(num);
+		
+	}
+	
+	
+	@Test
+	public void selectBookStockBatch(){
+		
+		selectBookStockForSaleBatch() ;
+		
+	}
+	@Test
+	public void update(){
+		
+		
+		
+		List<StockPojo> param = new ArrayList<StockPojo>();
+		param.add(new StockPojo(1L,2435));
+		param.add(new StockPojo(2L,12312));
+		param.add(new StockPojo(3L,32132));
+		param.add(new StockPojo(4L,223));
+		
+		
+		spm.updateStockNumBatch(param);
+		
+	}
+	public List<StockPojo> contorller(){
+
+		List<StockPojo> param = new ArrayList<StockPojo>();
+			param.add(new StockPojo(3, 9));
+			param.add(new StockPojo(4, 9999));
+			param.add(new StockPojo(5, 999));
+			param.add(new StockPojo(6, 99));
+			return param;
+	}
+	
+	
+	public List<StockPojo> selectBookStockForSaleBatch() {
+
+			List<StockPojo> param = contorller();
+
+		
+		
+			List<StockPojo> list = spm.selectBookStockForSaleBatch(param);
+		
+		return list;
+		
+	}
+	@Test
+	public  void selectBookStock() {
+		
+		List<Stock> param = sm.selectBookStock(3,null,null) ;
+		
+	System.out.println(param.get(0));	
+	
+	
+		
+	}
+	@Test
+	public  void dynamicSelect() {
+		PageHelper.startPage(1, 10);
+		List<Stock> list = sm.dynamicSelect("2018", "", "2018-12-8", null, null,1,10000);
+		System.out.println(list.size());
+	/*	System.out.println(list.get(0));
+		List<Stock> list1 = sm.selectStockNumRange(100,1000);
+		System.out.println(list1.size());
+		System.out.println(list1.get(0));*/
+		
+	}
+	
+	
+ public void updateBatch(){
+	 List<StockPojo> param = contorller();
+	 List<StockPojo> list = selectBookStockForSaleBatch();
+	 int size=param.size();
+	 for(int i=0;i<size;i++)
+		{
+			for(int j=0;j<size;j++){
+				if(list.get(j).getBookId()==param.get(i).getBookId()){
+					Integer num=param.get(i).getStockNum()-list.get(j).getStockNum();
+					if(	num>0)
+					{
+						list.get(j).setStockNum(num);
+					}else{
+						list.get(j).setStockNum(0);
+						//这里可以写一个递归
+					}
+					break;
+				};
+			}
+
+		}
+	 Integer num = spm.updateStockNumBatch(list);
+	 System.out.println(num);
+	 
+ }
+
+
+
+}

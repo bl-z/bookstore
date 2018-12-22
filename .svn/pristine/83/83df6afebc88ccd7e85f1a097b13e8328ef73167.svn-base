@@ -1,0 +1,77 @@
+
+window.onload=function(){
+	
+	//获取界面上隐藏的地区
+	var shengUID=$("#shengyincang").val();
+	var shiUID=$("#shiyincang").val();
+	var xianUID=$("#xianyincang").val();
+	//var opts=document.getElementById("sheng");
+	//设置地区被选中
+	$("#sheng").combobox('select',shengUID);
+	$("#shi").combobox('select',shiUID);
+	$("#xian").combobox('select',xianUID);
+		
+}
+ 
+//三级联动事件，选择省份，相应所有市跟着出来，选中市相应的县跟着出来。
+$(function(){                                                          
+		//触发省选项
+		$("#sheng").combobox({
+			onSelect:function(record){
+				$("#shi").combobox("setValue",''); //清空市
+				$("#xian").combobox("setValue",''); //清空县
+				var shengid=$('#sheng').combobox('getValue');
+				
+				$.ajax({
+					async:false,
+					url:"personalprofile_findshi.action",  
+					data:{shengid:shengid},
+					type:"POST",
+					dataType:"json",
+					success:function(data){
+						//alert(data);
+						$("#shi").combobox("loadData",data);
+					}
+					
+				});
+			}
+			
+		});
+		$('#shi').combobox({     
+		    editable:false, //不可编辑状态  
+		    cache: false,  
+		    panelHeight: '150',//自动高度适合  
+		    valueField:'iD',     
+		    textField:'province_city'  
+		   }); 
+ 
+		//触发市选项时
+		$("#shi").combobox({
+			onSelect:function(record){
+				$("#xian").combobox("setValue",''); //清空县
+				var shiid=$('#shi').combobox('getValue');
+				
+				$.ajax({
+					async : false,
+					url:"personalprofile_findxian.action",
+					cache:false,
+					data:{shiid:shiid},
+					type:"POST",
+					dataType:"json",
+					success:function(data){
+						$("#xian").combobox("loadData",data);
+					}
+					
+				});
+			}
+		});
+		
+		
+		$('#xian').combobox({     
+		    editable:false, //不可编辑状态  
+		    cache: false,  
+		    panelHeight: '150',//自动高度适合  
+		    valueField:'iD',     
+		    textField:'province_city'  
+		   }); 
+});

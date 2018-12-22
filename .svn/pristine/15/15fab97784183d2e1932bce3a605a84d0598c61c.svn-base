@@ -1,0 +1,88 @@
+package com.bs.admin.mapper;
+
+import java.util.List;
+
+import org.apache.ibatis.annotations.Param;
+
+import com.bs.admin.pojo.Order;
+
+/**
+ * 
+* <p>Title: OrderMapper</p>  
+* <p>Description: 订单mapper</p>  
+* @author 胡杰  
+* <p> @date 2018年12月7日</p>
+ */
+public interface OrderMapper {
+
+	/**
+	 * 
+	 * <p>Title: getOrderByOrderInfo</p>  
+	 * <p>Description: 查询订单信息</p>  
+	 * @param orderId              订单id
+	 * @param orderStatus		 订单状态
+	 * @param topPrice			 价格区间（第二个数）
+	 * @param bottomPrice		 价格区间（第一个数）
+	 * @param start					 开始行数（分页需要）
+	 * @param count					 结束行数
+	 * @return  
+	 * <p> @date 2018年12月7日  </p>
+	 */
+	List<Order> getOrderByOrderInfo(@Param("orderId") String orderId, @Param("orderStatus") String orderStatus,
+			@Param("topPrice") Double topPrice, @Param("bottomPrice") Double bottomPrice,
+			@Param("start") Integer start, @Param("count") Integer count);
+
+	/**
+	 * 
+	 * <p>Title: deleteOrder</p>  
+	 * <p>Description: 删除订单</p>  
+	 * @param orderId
+	 * @return  
+	 * <p> @date 2018年12月6日  </p>
+	 */
+	Integer deleteOrder(@Param("orderId") String orderId);
+	
+	/**
+	 * 
+	 * <p>Title: deleteBookOrder</p>  
+	 * <p>Description: 删除订单与书的中间表对应的信息</p>  
+	 * @param orderId
+	 * @return  
+	 * <p> @date 2018年12月17日  </p>
+	 */
+	Integer deleteBookOrder(@Param("orderId") String orderId);
+	
+	/**
+	 * 
+	 * <p>Title: updateOrder</p>  
+	 * <p>Description: 修改订单</p>  
+	 * @param orderId
+	 * @param orderStatus
+	 * @param totalPrice
+	 * @return  
+	 * <p> @date 2018年12月6日  </p>
+	 */
+	Integer updateOrder(@Param("orderId") String orderId, @Param("orderStatus") String orderStatus,
+			@Param("totalPrice") Double totalPrice, @Param("consignee") String consignee,
+			@Param("mobile") String mobile, @Param("province") String province, @Param("city") String city,
+			@Param("county") String county, @Param("detail") String detail);
+	
+	/**
+	 * 
+	 * <p>Title: getOrderStatus</p>  
+	 * <p>Description: 获取订单全部状态</p>  
+	 * @return  
+	 * <p> @date 2018年12月10日  </p>
+	 */
+	List<Order> getOrderStatus();
+	
+	/**
+	 * 
+	 * <p>Title: getOrderWinInfo</p>  
+	 * <p>Description: 获取窗口显示的信息</p>  
+	 * @param orderId
+	 * @return  
+	 * <p> @date 2018年12月11日  </p>
+	 */
+	List<Order> getOrderWinInfo(@Param("orderId") String orderId);
+}

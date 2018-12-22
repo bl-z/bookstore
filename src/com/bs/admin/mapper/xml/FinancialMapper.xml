@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.FinancialMapper">
+	
+	<!-- 查询支出、收入 -->
+	<select id="getAllFinancialStatus" resultMap="financialResultMap">
+		select
+		distinct(financial_status)
+		from t_financial
+	</select>
+	<!-- 查询支出、收入的类型 -->
+	<select id="getAllFinancaialTypes" resultMap="financialResultMap">
+		select
+		distinct(financial_types)
+		from t_financial
+	</select>
+	<!-- 添加财务信息 -->
+	<insert id="insertFinancial">
+		insert into t_financial
+		(
+		<include refid="financialColumns" />
+		)
+		values
+		(
+		<include refid="financialValues" />
+		)
+	</insert>
+	<!-- 删除财务信息 -->
+	<delete id="delFinancial">
+		delete from t_financial
+		where financial_id = #{financialId}
+	</delete>
+	<!-- 查询所有的财务信息 -->
+	<select id="getAllFinancial" resultMap="financialResultMap">
+		select
+		<include refid="allFinancialColumns" />
+		from t_financial
+		<where>
+			<if test="financialStatus!=null and financialStatus!='' ">
+				financial_status = #{financialStatus}
+			</if>
+			<if test="financialTypes!=null and financialTypes!='' ">
+				and financial_types = #{financialTypes}
+			</if>
+			<if test="null!=financialStart and financialStart!='' and null!= financialEnd and financialEnd!=''">
+				and financial_date between #{financialStart} and #{financialEnd}
+			</if>
+		</where>
+		<if test="null!=start and null!= end">
+			LIMIT #{start},#{end}
+		</if>
+	</select>
+	<!-- 查询此类支出信息 -->
+	<select id="getIdByFinancial" resultMap="financialResultMap">
+		select financial_id from
+		t_financial
+		<where>
+			<if test="null!=financialStatus and financialStatus!=''">
+				financial_status = #{financialStatus}
+			</if>
+			<if test="null!=financialTypes and financialTypes!=''">
+				and financial_types = #{financialTypes}
+			</if>
+			<if test="null!=financialMoney and financialMoney!=''">
+				and financial_money = #{financialMoney}
+			</if>
+			<if test="null!=financialDate and financialDate!=''">
+				and financial_date = #{financialDate}
+			</if>
+			<if test="null!=transactionDate and transactionDate!=''">
+				and transaction_date = #{transactionDate}
+			</if>
+			<if test="null!=financialDetails and financialDetails!=''">
+				and financial_details = #{financialDetails}
+			</if>
+		</where>
+	</select>
+	<!-- 查询总条数 -->
+	<select id="getFinancialTotal" resultType="java.lang.Integer">
+		SELECT count(*) from
+		t_financial
+		<where>
+			<if test="null!=financialStatus and financialStatus!=''">
+				financial_status = #{financialStatus}
+			</if>
+			<if test="null!=financialTypes and financialTypes!=''">
+				and financial_types = #{financialTypes}
+			</if>
+			<if test="null!=financialStart and financialStart!='' and null!= financialEnd and financialEnd!=''">
+				and financial_date between #{financialStart} and #{financialEnd}
+			</if>
+		</where>
+	</select>
+	<!-- 修改支出信息 -->
+	<update id="updateFinancial">
+		update t_financial
+		<set>
+			<if test="null!=financialStatus and financialStatus!=''">
+				financial_status = #{financialStatus},
+			</if>
+			<if test="null!=financialTypes and financialTypes!=''">
+				financial_types = #{financialTypes},
+			</if>
+			<if test="null!=financialMoney and financialMoney!=''">
+				financial_money = #{financialMoney},
+			</if>
+			<if test="null!=financialDate and financialDate!=''">
+				financial_date = #{financialDate},
+			</if>
+			<if test="null!=transactionDate and transactionDate!=''">
+				and transaction_date = #{transactionDate},
+			</if>
+			<if test="null!=financialDetails and financialDetails!=''">
+				financial_details = #{financialDetails}
+			</if>
+		</set>
+		where financial_id = #{financialId}
+	</update>
+	
+
+	<resultMap type="financial" id="financialResultMap" autoMapping="true">
+	</resultMap>
+	
+	<sql id="financialColumns">financial_status,financial_types,financial_money,financial_date,transaction_date,financial_details
+	</sql>
+	<sql id="financialValues">#{financialStatus},#{financialTypes},#{financialMoney},#{financialDate},#{transactionDate},#{financialDetails}
+	</sql>
+	<sql id="allFinancialColumns">financial_id,financial_status,financial_types,financial_money,financial_date,transaction_date,financial_details
+	</sql>
+	<sql id="allFinancialValues">#{financialId},#{financialStatus},#{financialTypes},#{financialMoney},#{financialDate},#{transactionDate},#{financialDetails}
+	</sql>
+</mapper>

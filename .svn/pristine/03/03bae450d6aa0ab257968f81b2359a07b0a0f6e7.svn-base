@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.bs.admin.mapper.SupplierMapper">
+
+
+
+	<!-- 添加一个供应商 -->
+	<insert id="insertSupplier">
+		insert into t_supplier(
+		<include refid="supplierColumnsWithoutId" />
+		)
+		values(
+		<include refid="supplierValuesWithoutId" />
+		)
+	</insert>
+
+	<!-- 只有查询该供应商的历史记录数为0时才可以删除 -->
+	<delete id="deleteSupplierById">
+		delete from t_supplier where
+		supplier_id=${supplierId}
+	</delete>
+
+	<!-- 修改多个数据 -->
+	<update id="updateSupplierById">
+		update t_supplier
+		<trim prefix="set" suffixOverrides=",">
+			<if test="null!=supplierName and supplierName!=''">
+				supplier_name=#{supplierName},
+			</if>
+			<if test="null!=supplierPhone">
+				supplier_phone=#{supplierPhone},
+			</if>
+			<if test="null!=supplierAddress">
+				supplier_address=#{supplierAddress},
+			</if>
+			<if test="null!=supplierContact">
+				supplier_contact=#{supplierContact},
+			</if>
+			<if test="null!=supplierContactPhone">
+				supplier_contact_phone=#{supplierContactPhone},
+			</if>
+			<if test="null!=cooperateStatus">
+				cooperate_status=#{cooperateStatus},
+			</if>
+			<if test="null!=cooperateDate and cooperateDate!=''">
+				cooperate_date=#{cooperateDate},
+			</if>
+		</trim>
+		where supplier_id=#{supplierId}
+	</update>
+
+	<!-- 多条件单表查询 -->
+	<select id="dynamicSelect" resultMap="supplierMap">
+		select
+		<include refid="supplierColumns" />
+		from
+		t_supplier
+		<where>
+			<if test="supplier!=null">
+				<if test="supplier.supplierName!=null and supplier.supplierName !=''">
+					and supplier_name like
+					concat('%',#{supplier.supplierName},'%')
+				</if>
+				<if
+					test="supplier.cooperateStatus!=null">
+					and cooperate_status=#{supplier.cooperateStatus}
+				</if>
+
+			</if>
+			
+			<if test="startDate!= null and startDate!=''">
+				AND cooperate_date &gt;='${startDate}'
+			</if>
+			
+			<if test="endDate!= null and endDate!=''">
+				AND cooperate_date &lt;='${endDate}'
+			</if>
+
+		</where>
+	</select>
+
+	<select id="selectSupplierAll" resultMap="supplierMap">
+		select
+		<include refid="supplierColumns" />
+		from t_supplier
+	</select>
+
+
+	<!-- 查询该供应商对应的历史purchase条目数 -->
+	<select id="selectCooperateCountById" resultType="java.lang.Integer">
+		select count(*)
+		from t_purchase where supplier_id=${supplierId}
+	</select>
+
+
+	<!-- 通过id查询supplier -->
+	<select id="selectBySupplierId" resultMap="supplierMap">
+		select
+		<include refid="supplierColumns" />
+		from t_supplier where supplier_id=#{supplierId}
+	</select>
+
+
+
+
+
+	<resultMap type="Supplier" id="supplierMap" autoMapping="true" />
+
+
+
+	<sql id="supplierColumns">
+		`t_supplier`.`supplier_id`,
+		`t_supplier`.`supplier_name`,
+		`t_supplier`.`supplier_phone`,
+		`t_supplier`.`supplier_address`,
+		`t_supplier`.`supplier_contact`,
+		`t_supplier`.`supplier_contact_phone`,
+		`t_supplier`.`cooperate_date`,
+		`t_supplier`.`cooperate_status`
+	</sql>
+	<sql id="supplierValues">
+		#{supplierId},
+		#{supplierName},
+		#{supplierPhone},
+		#{supplierAddress},
+		#{supplierContact},
+		#{supplierContactPhone},
+		#{cooperateDate},
+		#{cooperateStatus}
+	</sql>
+
+	<sql id="supplierColumnsWithoutId">
+		`t_supplier`.`supplier_name`,
+		`t_supplier`.`supplier_phone`,
+		`t_supplier`.`supplier_address`,
+		`t_supplier`.`supplier_contact`,
+		`t_supplier`.`supplier_contact_phone`,
+		`t_supplier`.`cooperate_date`,
+		`t_supplier`.`cooperate_status`
+	</sql>
+	<sql id="supplierValuesWithoutId">
+		#{supplierName},
+		#{supplierPhone},
+		#{supplierAddress},
+		#{supplierContact},
+		#{supplierContactPhone},
+		#{cooperateDate},
+		#{cooperateStatus}
+	</sql>
+
+
+
+
+
+
+
+
+
+
+
+
+
+</mapper>

@@ -1,0 +1,59 @@
+/*package com.bs.admin.controller;
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.bs.admin.pojo.PrintInfo;
+import com.bs.admin.pojo.Printer;
+import com.bs.admin.service.PrinterService;
+
+@RestController  // 此注解是返回return里的内容
+@RequestMapping("printer")
+public class PrinterController {
+
+	@Autowired
+	private PrinterService ps;
+	
+	/**
+	 * 通过印刷商id查询印刷信息，已验证
+	 *//*
+	@GetMapping("getPrinter")
+	public List<Printer> getPrinter(Printer printer) {
+		List<Printer> printerList = ps.queryPrinter(printer);
+		System.out.println("printerList：" + printerList);
+		return printerList;
+	}
+	
+	@GetMapping(value="addPrinter", produces="text/html;charset=utf-8")
+	public String addPrinter(Printer printer, PrintInfo printInfo){
+		Integer rows = 0;
+		System.out.println("printer：" + printer);
+		System.out.println("printInfo：" + printInfo);
+		Integer pi = ps.createPrintInfo(printInfo);
+		if (null != printer.getPrinterName() && null != printInfo.getPrintId()) {
+			rows = ps.createPrinter(printer, printInfo);
+		}
+		System.out.println("rows：" + rows);
+		return "添加了printer：" + rows + " 行，printInfo：" + pi;
+	}
+	
+	@GetMapping(value="updatePrinter", produces="text/html;charset=utf-8")
+	public String updatePrinter(PrintInfo printInfo, Printer printer){
+		System.out.println("printer："+printer);
+		System.out.println("printInfo：" + printInfo);
+		if (null != printInfo.getPrintId() && null != printer.getPrinterName()) {
+			Integer up = ps.updatePrinter(printer, printInfo);
+			System.out.println("up：" + up);
+		}
+		Integer rows = ps.updatePrintInfo(printInfo);
+		return "修改了" + rows + " 行";
+	}
+	
+}
+*/

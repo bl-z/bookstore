@@ -1,0 +1,52 @@
+package com.bs.admin.mapper;
+
+import java.util.List;
+
+import org.junit.Test;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
+import com.bs.admin.pojo.Admin;
+import com.bs.admin.pojo.Log;
+import com.bs.admin.pojo.PageData;
+import com.bs.admin.pojo.QueryBoxData;
+import com.bs.admin.service.EmployeeService;
+import com.bs.admin.service.LogService;
+
+public class LogTest {
+	private static ApplicationContext context = new ClassPathXmlApplicationContext("application_Context.xml");
+	private static SupplierMapper bean;
+	private static LogMapper lm = context.getBean(LogMapper.class);
+	private static EmployeeService es = context.getBean(EmployeeService.class);
+	private static LogService ls = context.getBean(LogService.class);
+
+	@Test
+	public void insert() {
+		Admin admin = new Admin();
+		admin.setAdminId(1L);
+		Log log = new Log(admin, 1, "test", "测试插入", "192.168.10.62","采购");
+		lm.insertLog(log);
+		lm.insertLog(log);
+		lm.insertLog(log);
+	}
+	@Test
+	public void delete() {
+		ls.delLog("2018-12-10", "2018-12-11");
+	}
+	@Test
+	public void dept() {
+		List<QueryBoxData> list = es.retrieveDeptAll();
+		System.out.println(list.get(1));
+	}
+	
+	@Test
+	public void select() {
+		Admin admin = new Admin();
+		admin.setAdminId(2L);
+		Log log = new Log(null, null, null, null, null,null);
+//		List<Log> list = lm.dynamicSelectLog(null,null,"2018-12-12 00:00:00");
+		 PageData<Log> list = ls.dynamicGet(null, null, null, null, "产品信息部", null, null, 1, 10);
+		System.out.println(list.getTotal());
+	}
+
+}

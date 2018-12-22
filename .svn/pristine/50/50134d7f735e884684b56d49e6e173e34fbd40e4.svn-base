@@ -1,0 +1,197 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  
+  <mapper namespace="com.bs.admin.mapper.BookMapper">
+  
+  <!-- 测试用的sql -->
+  <update id="update">
+  		update t_book set book_status=#{a} where book_id=#{id}
+  </update>
+  
+  <!-- 通过书的id获取书的信息 -->
+  <select id="getBookByBookId" resultMap="bookResultMap">
+  		select  <include refid="bookColumns"/>
+		from t_book b
+		where b.book_id = #{bookId}
+  </select>
+  
+  <!-- 获取书的全部类型 -->
+  <select id="getBookCategory" resultMap="bookResultMap">
+  		select book_category
+		from t_book 
+		group by book_category
+  </select>
+  
+  <!-- 获取书的全部状态 -->
+  <select id="getBookStatus" resultMap="bookResultMap">
+  		select book_status
+		from t_book 
+		group by book_status
+  </select>
+  
+  <!-- 获取书的印刷商 -->
+  <select id="getPublishName" resultMap="bookResultMap">
+  		select publish_name
+		from t_book 
+		group by publish_name
+  </select>
+  
+  <!-- 删除书 -->
+  <delete id="deleteBook">
+  	delete from t_book where book_id=#{bookId}
+  </delete>
+  
+  <!-- 删除书的同时需要删除中间表的关系 -->
+  <delete id="deleteBookAuthor">
+  	delete from t_book_author where book_id=#{bookId}
+  </delete>
+  
+  <!-- 获取查询出来的行数 -->
+  <select id="getTotal" resultType="java.lang.Integer">
+  		select count(b.primary_id) 
+  		from t_book b, t_author a, t_book_author ba
+  		where b.book_id = ba.book_id 
+		and a.author_id = ba.author_id  
+  		<trim prefix="and" suffixOverrides="and">
+  			<if test="null != value and '' != value">
+				b.book_id = #{value} or b.book_name like concat('%', #{value}, '%') and 
+			</if>
+			<if test="null != bottomPrice and '' != topPrice">
+				b.book_sales_price &gt; #{bottomPrice} and b.book_sales_price &lt; #{topPrice} and 
+			</if>
+			<if test="null != publishName and '' != publishName">
+				b.publish_name like concat('%', #{publishName}, '%') and 
+			</if>
+			<if test="null != bookCategory and '' != bookCategory">
+				b.book_category = #{bookCategory} and 
+			</if>
+			<if test="null != bookStatus and '' != bookStatus">
+				b.book_status = #{bookStatus} and
+			</if>
+			<if test="null != authorName and '' != authorName">
+				a.author_name like concat('%', #{authorName}, '%')
+			</if>
+		 </trim>
+  </select>
+  
+  <!-- 多条件查询书的信息 -->
+  <select id="getBookByBookInfo" resultMap="bookResultMap">
+  		select  <include refid="bookColumns"/>,<include refid="authorColumns"/>
+		from t_book b, t_author a, t_book_author ba 
+		where b.book_id = ba.book_id 
+		and a.author_id = ba.author_id 
+		<trim prefix="and" suffixOverrides="and">
+			<if test="null != value and '' != value">
+				b.book_id = #{value} or b.book_name like concat('%', #{value}, '%') and 
+			</if>
+			<if test="null != bottomPrice and '' != topPrice">
+				b.book_sales_price &gt; #{bottomPrice} and b.book_sales_price &lt; #{topPrice} and 
+			</if>
+			<if test="null != publishName and '' != publishName">
+				b.publish_name like concat('%', #{publishName}, '%') and 
+			</if>
+			<if test="null != bookCategory and '' != bookCategory">
+				b.book_category = #{bookCategory} and 
+			</if>
+			<if test="null != bookStatus and '' != bookStatus">
+				b.book_status = #{bookStatus} and
+			</if>
+			<if test="null != authorName and '' != authorName">
+				a.author_name like concat('%', #{authorName}, '%')
+			</if>
+		 </trim>
+		 <trim prefixOverrides="and">
+				limit #{start}, #{count}
+		 </trim>
+  </select>
+  
+  
+  <!-- 获取条数 -->
+  <select id="getAllTotal" resultType="java.lang.Integer">
+  		select
+  		count(primary_id)
+  		from t_book
+  		<where>
+			<if test="bookName!=null and bookName!=''">
+				book_name = #{bookName}
+			</if>
+			<if test="bookCategory!=null and bookCategory!=''">
+				and book_category = #{bookCategory}
+			</if>
+			<if test="bookStatus!=null and bookStatus!=''">
+				and book_status = #{bookStatus}
+			</if>
+			<if test="bottomPrice!=null and bottomPrice!='' and topPrice!=null and topPrice!=''">
+				and book_sales_price between #{bottomPrice} and #{topPrice}
+			</if>
+		</where>
+  </select>
+  
+  <!-- 获取所有的书 -->
+  <select id="getAllBook" resultMap="bookResultMap">
+  		select
+  		<include refid="allBookColumns"/>
+		from t_book
+		<where>
+			<if test="bookName!=null and bookName!=''">
+				book_name = #{bookName}
+			</if>
+			<if test="bookCategory!=null and bookCategory!=''">
+				and book_category = #{bookCategory}
+			</if>
+			<if test="bookStatus!=null and bookStatus!=''">
+				and book_status = #{bookStatus}
+			</if>
+			<if test="bottomPrice!=null and bottomPrice!='' and topPrice!=null and topPrice!=''">
+				and book_sales_price between #{bottomPrice} and #{topPrice}
+			</if>
+		</where>
+		<if test="null!=start and null!= end">
+			LIMIT #{start},#{end}
+		</if>
+  </select>
+  
+  
+  <!-- 只获取书名 -->
+  <select id="getBookName" resultMap="bookResultMap">
+  	select book_name from t_book
+  </select>
+  
+  <!-- 只获取书id -->
+  <select id="getBookIdByBooKName" resultType="java.lang.Integer">
+  	select book_id from t_book where book_name =#{bookName}
+  </select>
+  
+  <!-- book的映射 -->
+  <resultMap type="book" id="bookResultMap" autoMapping="true">
+  		<id column="primary_id" property="primaryId"/>
+  		<collection property="authors" ofType="author" autoMapping="true"/>
+  </resultMap>
+
+  <!-- book字段 -->
+  <sql id="bookColumns">
+  		b.primary_id, b.book_id, b.book_name, b.book_category, b.book_sales_price, b.book_profile, b.book_cover_image,
+  		b.book_status, b.publish_name, b.print_id, b.stock_sales
+  </sql>
+  
+  <!-- book对应的实体类的属性 -->
+  <sql id="bookValues">
+  		#{bookId}, #{bookName}, #{bookCategory}, #{bookSalesPrice}, #{bookProfile}, #{bookCoverImage}, 
+  		#{bookStatus}, #{publishName}, #{printId}
+  </sql>
+  
+  <!-- t_message字段 -->
+  <sql id="messageColumns">
+  		m.message_id, m.message_info, m.book_id
+  </sql>
+  
+  <!-- t_author表字段 -->
+  <sql id="authorColumns">
+  	a.author_id ,a.author_name
+  </sql>
+  <sql id="allBookColumns">primary_id,book_id,book_name, book_category, book_sales_price, book_profile, book_cover_image,book_status
+  </sql>
+
+  </mapper>

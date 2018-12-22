@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.bs.admin.mapper.PurchaseItemMapper">
+
+	<!-- 批量增加数据 -->
+	<insert id="insertPurchaseItems" parameterType="purchaseItem">
+		insert into t_purchase_item(
+		<include refid="withoutIdColumns" />
+		) values
+		<foreach collection="collection" separator="," item="item">
+			(
+			<include refid="purchaseValuesBatch" />
+			)
+		</foreach>
+	</insert>
+
+
+	<!-- 批量删除指定id的数据， 该操作仅仅执行在订单详情中 -->
+	<delete id="deletePurchaseItemByIdBatch" parameterType="java.lang.Long">
+		delete from t_purchase_item where purchase_item_id in(
+		<foreach collection="collection" index="index" item="item"
+			separator=",">
+			#{item}
+		</foreach>
+		)
+	</delete>
+
+	<!-- 批量删除指定purchaseId的数据， 该操作仅仅执行在订单详情中 -->
+	<delete id="deletePurchaseItemByPurchaseId" parameterType="java.lang.Integer">
+		delete from t_purchase_item where purchase_id=${purchaseId}
+	</delete>
+
+
+
+
+	<!-- 修改单个项目的信息 -->
+	<update id="updatePurchaseItem">
+		update t_purchase_item
+		<trim prefix="set" suffixOverrides=",">
+			<if test="null!=book and book.bookId !=null">
+				book_id=#{book.bookId},
+			</if>
+			<if test="null!=purchaseNum ">
+				purchase_num=#{purchaseNum},
+			</if>
+			<if test="null!=purchasePrice ">
+				purchase_price=#{purchasePrice},
+			</if>
+		</trim>
+		where purchase_item_id=#{purchaseItemId}
+	</update>
+
+
+
+	<!-- 通过采购信息查询 -->
+	<select id="selectByPurchaseId" resultMap="PurchaseItemShow">
+		select
+		<include refid="Columns" />
+		from t_purchase_item where purchase_id=${purchaseId}
+	</select>
+
+	<!-- 通过书本查询采购信息 -->
+	<select id="selectByBookId" resultMap="PurchaseItemShow">
+		select
+		<include refid="Columns" />
+		from t_purchase_item where book_id=${bookId}
+	</select>
+
+	<!-- 通过item 查询项目 -->
+	<select id="selectPurchaseItemById" resultMap="PurchaseItemShow">
+		select
+		<include refid="Columns" />
+		from t_purchase_item where purchase_item_id=#{id}
+
+	</select>
+
+
+	<!-- 查询所有的待入库项目 可以根据采购批次，书名进行查询 -->
+	<select id="dynamicSelectPI3" resultMap="PurchaseItemShow">
+		select
+		<include refid="Columns" />
+		from t_purchase_item where purchase_id in(select purchase_id
+		from t_purchase where purchase_status=3 
+		and purchase_item_id not in (select purchase_item_id from t_stock) 
+		<if test="purchaseBatch!=null and purchaseBatch!=''">
+			and purchase_batch like
+			concat('%','${purchaseBatch}','%')
+		</if>
+		
+		)
+		<if test="bookName!=null and bookName!=''">
+			and book_id in(select book_id from t_book where
+			book_name like concat('%','${bookName}','%'))
+		</if>
+	</select>
+
+
+
+
+
+
+	<resultMap type="PurchaseItem" id="PurchaseItemShow" autoMapping="true">
+		<association property="book" javaType="Book"
+			select="com.bs.admin.mapper.BookMapper.getBookByBookId" column="book_id" />
+		<association property="purchase" javaType="Purchase"
+			select="com.bs.admin.mapper.PurchaseMapper.selectPurchaseById"
+			column="purchase_id" /> 
+	</resultMap>
+
+
+
+	<sql id="Columns">
+		purchase_item_id, purchase_id, book_id, purchase_num,
+		purchase_price
+	</sql>
+	<sql id="withoutIdColumns">
+		purchase_id, book_id, purchase_num, purchase_price
+	</sql>
+	<sql id="withoutIdValues">
+		#{purchase.purchaseId}, #{book.bookId}, #{purchaseNum},
+		#{purchasePrice}
+	</sql>
+	<sql id="Values">
+		#{purchaseItemId}, #{purchase.purchaseId}, #{book.bookId},
+		#{purchaseNum}, #{purchasePrice},
+	</sql>
+
+	<sql id="purchaseValuesBatch">
+		#{item.purchase.purchaseId}, #{item.book.bookId},
+		#{item.purchaseNum}, #{item.purchasePrice}
+	</sql>
+
+</mapper>

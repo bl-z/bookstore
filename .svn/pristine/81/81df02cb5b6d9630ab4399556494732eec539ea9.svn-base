@@ -1,0 +1,154 @@
+<%@ page language="java" contentType="text/html; charset=utf-8"
+	pageEncoding="utf-8"%>
+<%
+	String path = request.getContextPath();
+	String basePath = request.getScheme() + "://" + request.getServerName() + ":" + request.getServerPort()
+			+ path + "/";
+	System.out.print("basePath : " + basePath);
+%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/themes/bootstrap/easyui.css">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/themes/icon.css">
+<link rel="stylesheet" type="text/css"
+	href="<%=path%>/jquery-easyui-1.4.5/demo/demo.css">
+	<link rel="stylesheet" href="<%=path%>/css/wsk.css">
+<script type="text/javascript" src="<%=path%>/js/jquery-2.2.1.min.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/jquery.easyui.min.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.datagrid.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.dialog.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.form.js"></script>
+<script type="text/javascript"
+	src="<%=path%>/jquery-easyui-1.4.5/plugins/jquery.messager.js"></script>
+<script>
+function doSearch(){ 
+	
+	$.ajax({			
+		url:'<%=basePath%>stock/getVStock',
+		dataType:'json',
+		async:false,
+		data:{
+			bookName:$("#bookName").val(),
+			currentPage			:1,
+			pageSize			:10
+		},
+		success:function(data){
+			$("#dg").datagrid('loadData',data.value);				
+			console.log(data);
+		}
+	});
+	
+
+}
+
+$(function(){	
+
+	
+
+	$('#dg').datagrid({  
+		title:'库存概览',	
+ 		 columns:[[    
+ 		 {field:'book',title:'项目名称',width:100,align:'center',
+ 			formatter: function(value,row,index){
+				if (row.book){
+					return row.book.bookName;
+				} else {
+					return '未知';
+				}
+			}
+ 		 }   ,
+ 		 {field:'stockNum',title:'库存数量',width:100,align:'center',
+ 			styler: function(value,row,index){
+				if (value < 100){
+					return 'background-color:rgba(255,0,0,0.5);color:blue;';
+				}
+			}
+
+ 		 }  ,  
+ 		 {field:'213',title:'库存数量',width:100,align:'center',
+ 			formatter: function(value,row,index){
+				return '<a href="bookStockQuery?bookId=3" target="_self"> 查看详情 </a>'
+			}
+
+ 		 }    
+ 		 
+ 		 ]] ,
+ 		 pagination:true,
+ 		 pageList:[5,10,20],
+ 		 fitColumns:true,
+ 		 striped:true,
+ 		 rownumbers:true,
+ 		 singleSelect:true,
+ 		 });   
+	doSearch();
+	var pager = $('#dg').datagrid('getPager');	
+	pager.pagination({
+		pageSize:10,
+		pageNumber:1,
+		showPageList:true,
+		onSelectPage:function(pageNumber, pageSize){
+			$.ajax({
+				url:'<%=basePath%>stock/getVStock',
+						dataType : 'json',
+						async : false,
+						data : {
+							bookName:$("#bookName").val(),
+							currentPage : pageNumber,
+							pageSize : pageSize
+						},
+						success : function(data) {
+							$("#dg").datagrid('loadData', data.value);
+							console.log(data);
+						}
+					});
+				}
+			});
+		});
+
+</script>
+
+<title>库存查询</title>
+
+</head>
+<body>
+
+
+
+
+
+	<table id="dg" title="" class="easyui-datagrid" onClickRow="ClickRow" toolbar="#toolBar" > </table>
+	<div id="toolBar">
+	<input id="bookName" class="easyui-searchbox" style="width: 100px" data-options="searcher:doSearch,prompt:'请输入书名关键字'"></input>
+
+	&emsp;
+	
+	&emsp;
+
+			
+		<br> 
+			
+	</div>
+
+
+  
+
+    
+        
+
+	
+	
+	
+	
+	
+</body>
+
+	
+</html>

@@ -1,0 +1,89 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+body{
+	background: url("../images/bg.jpg");
+	background-size: cover;
+	background-repeat:no-repeat;
+}
+
+/* .main{
+    margin-top: 50px;
+    height: 400px;
+    overflow: hidden;
+    
+} */
+.login{
+    background-color: #ffffff;
+    margin: auto;
+    margin-top: 40px;
+    width: 400px;
+    height: 360px;
+    opacity: 0.8;
+    border-radius: 10%;
+}
+.title{
+    text-align: center;
+    border-bottom: 1px solid #ddd;
+    font-size: 18px;
+    font-weight: 700;
+    color: #666;
+    line-height: 50px;
+}
+
+form{
+    height: 200px;
+}
+.userName,.psw{
+    margin: auto;
+    display: block;
+    line-height: 40px;
+    margin-top: 20px;
+    width: 360px;
+    outline: none;
+}
+.save{
+	width:150px;
+	
+	margin:20px auto;
+	
+}
+.loginBtn{
+    background-color: #e43a3d;
+    color: #ffffff;
+    font-size: 20px;
+    user-select: none;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    display: block;
+    margin: auto;
+    margin-top: 20px;
+    line-height: 40px;
+    width: 360px;
+}
+.other{
+	line-height:50px;
+	
+}
+.other a{
+    text-decoration: none;
+    font-size: 12px;
+    float: right;
+    padding-right: 20px;
+}
+.error{
+	text-align : center;
+	position: relative;
+    padding: 4px 0 4px 4px;
+    margin:10px auto;
+    margin-top:10px;
+    font-size:10px;
+    width:140px;
+    border: 1px solid red;
+    background: #fde9e9;
+    color: red;
+    display:none;
+    text-align:center;
+}

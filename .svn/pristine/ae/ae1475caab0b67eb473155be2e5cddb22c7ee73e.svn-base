@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h3>权限不够或者未登录</h3>
+	如果未登录，可<a href="http://localhost:8080/bookstore/login.jsp" target="_blank">点此登录</a>
+</body>
+</html>
